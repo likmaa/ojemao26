@@ -34,10 +34,10 @@ export default function Header() {
         <div style={styles.topBarContainer}>
           <span style={styles.topBarText}>Une initiative conjointe de :</span>
           <div style={styles.topBarLogos}>
-            <Image src="/images/organisateurs/logo_ojemao.png" alt="OJEMAO" width={40} height={25} style={{ objectFit: 'contain' }} />
-            <Image src="/images/organisateurs/logo_aimb.png" alt="AIMB" width={30} height={25} style={{ objectFit: 'contain' }} />
-            <Image src="/images/organisateurs/logo_aceemub.png" alt="ACEEMUB" width={30} height={25} style={{ objectFit: 'contain' }} />
-            <Image src="/images/organisateurs/logo_raibenin.png" alt="RAI-Bénin" width={30} height={25} style={{ objectFit: 'contain' }} />
+            <Image src="/images/organisateurs/logo_ojemao.webp" alt="OJEMAO" width={40} height={25} style={{ objectFit: 'contain' }} />
+            <Image src="/images/organisateurs/logo_aimb.webp" alt="AIMB" width={30} height={25} style={{ objectFit: 'contain' }} />
+            <Image src="/images/organisateurs/logo_aceemub.webp" alt="ACEEMUB" width={30} height={25} style={{ objectFit: 'contain' }} />
+            <Image src="/images/organisateurs/logo_raibenin.webp" alt="RAI-Bénin" width={30} height={25} style={{ objectFit: 'contain' }} />
           </div>
         </div>
       </div>

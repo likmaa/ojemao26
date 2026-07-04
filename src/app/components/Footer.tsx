@@ -49,10 +49,10 @@ export default function Footer() {
             
             <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '0.5rem', alignItems: 'center' }}>
               {[
-                "logo_ojemao.png",
-                "logo_aimb.png",
-                "logo_aceemub.png",
-                "logo_raibenin.png"
+                "logo_ojemao.webp",
+                "logo_aimb.webp",
+                "logo_aceemub.webp",
+                "logo_raibenin.webp"
               ].map((name, i) => (
                 <div key={i}>
                   <img src={`/images/organisateurs/${name}`} alt={`Organisateur ${i + 1}`} style={{ height: '40px', width: 'auto', objectFit: 'contain' }} />

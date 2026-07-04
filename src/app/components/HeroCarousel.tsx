@@ -6,9 +6,9 @@ import Link from 'next/link';
 import { IoLocationOutline, IoCalendarOutline } from 'react-icons/io5';
 
 const images = [
-  '/images/DSC_0564.jpg',
-  '/images/DSC_0568.jpg',
-  '/images/DSC_0569.jpg'
+  '/images/DSC_0564.webp',
+  '/images/DSC_0568.webp',
+  '/images/DSC_0569.webp'
 ];
 
 export default function HeroCarousel() {

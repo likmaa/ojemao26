@@ -7,7 +7,7 @@ export const revalidate = 0;
 
 export default async function CifPage() {
   const { data: eventRow } = await supabase.from('events').select('image_url').eq('title', 'cif').maybeSingle();
-  const cifImage = eventRow?.image_url || '/images/affiche-co1.jpg';
+  const cifImage = eventRow?.image_url || '/images/affiche-co1.webp';
 
   return (
     <div style={styles.page} className="animate-fade-in">

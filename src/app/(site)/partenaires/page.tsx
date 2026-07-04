@@ -3,21 +3,21 @@ import Link from 'next/link';
 
 export default function PartenairesPage() {
   const logos = [
-    '307697944_422326529983064_7008464641129287907_n-removebg-preview.png',
-    '310606857_6168992549794905_2704647731196745770_n-removebg-preview.png',
+    '307697944_422326529983064_7008464641129287907_n-removebg-preview.webp',
+    '310606857_6168992549794905_2704647731196745770_n-removebg-preview.webp',
     'télécharger-removebg-preview (2).png',
-    'télécharger__1_-removebg-preview (2).png',
-    'télécharger__2_-removebg-preview.png',
-    'télécharger__3_-removebg-preview (1).png',
-    'télécharger__3_-removebg-preview.png',
-    'télécharger__4_-removebg-preview.png'
+    'télécharger__1_-removebg-preview (2).webp',
+    'télécharger__2_-removebg-preview.webp',
+    'télécharger__3_-removebg-preview (1).webp',
+    'télécharger__3_-removebg-preview.webp',
+    'télécharger__4_-removebg-preview.webp'
   ];
 
   const organizers = [
-    { name: 'OJEMAO', logo: '/images/organisateurs/logo_ojemao.png', role: 'Organisation de Tutelle Régionale', details: "Organisation de la Jeunesse Musulmane en Afrique de l'Ouest" },
-    { name: 'AIMB', logo: '/images/organisateurs/logo_aimb.png', role: 'Organisateur Local et stratégique', details: 'Amicale des Intellectuels Musulmans du Bénin' },
-    { name: 'ACEEMUB (UIB)', logo: '/images/organisateurs/logo_aceemub.png', role: 'Coorganisateur Local & Logistique', details: 'Association Culturelle et des Élèves et Étudiants Musulmans du Bénin' },
-    { name: 'RAI-Bénin', logo: '/images/organisateurs/logo_raibenin.png', role: 'Co-porteur Citoyen & Mobilisation', details: 'Réseau des Associations et ONGs Islamiques du Bénin' },
+    { name: 'OJEMAO', logo: '/images/organisateurs/logo_ojemao.webp', role: 'Organisation de Tutelle Régionale', details: "Organisation de la Jeunesse Musulmane en Afrique de l'Ouest" },
+    { name: 'AIMB', logo: '/images/organisateurs/logo_aimb.webp', role: 'Organisateur Local et stratégique', details: 'Amicale des Intellectuels Musulmans du Bénin' },
+    { name: 'ACEEMUB (UIB)', logo: '/images/organisateurs/logo_aceemub.webp', role: 'Coorganisateur Local & Logistique', details: 'Association Culturelle et des Élèves et Étudiants Musulmans du Bénin' },
+    { name: 'RAI-Bénin', logo: '/images/organisateurs/logo_raibenin.webp', role: 'Co-porteur Citoyen & Mobilisation', details: 'Réseau des Associations et ONGs Islamiques du Bénin' },
   ];
 
   return (

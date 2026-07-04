@@ -10,8 +10,8 @@ export const revalidate = 0;
 export default async function Home() {
   const { data: fetchedEvents } = await supabase.from('events').select('*');
   
-  const debatImage = fetchedEvents?.find(e => e.title === 'debat')?.image_url || '/images/affiche-d1.jpg';
-  const cifImage = fetchedEvents?.find(e => e.title === 'cif')?.image_url || '/images/affiche-co1.jpg';
+  const debatImage = fetchedEvents?.find(e => e.title === 'debat')?.image_url || '/images/affiche-d1.webp';
+  const cifImage = fetchedEvents?.find(e => e.title === 'cif')?.image_url || '/images/affiche-co1.webp';
 
   return (
     <div className="animate-fade-in">

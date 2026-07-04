@@ -8,8 +8,8 @@ import Image from 'next/image';
 export default function AdminEvents() {
   const [uploadingDebat, setUploadingDebat] = useState(false);
   const [uploadingCif, setUploadingCif] = useState(false);
-  const [debatPreview, setDebatPreview] = useState('/images/affiche-d1.jpg');
-  const [cifPreview, setCifPreview] = useState('/images/affiche-co1.jpg');
+  const [debatPreview, setDebatPreview] = useState('/images/affiche-d1.webp');
+  const [cifPreview, setCifPreview] = useState('/images/affiche-co1.webp');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

@@ -7,7 +7,7 @@ export const revalidate = 0;
 
 export default async function DebatPage() {
   const { data: eventRow } = await supabase.from('events').select('image_url').eq('title', 'debat').maybeSingle();
-  const debatImage = eventRow?.image_url || '/images/affiche-d1.jpg';
+  const debatImage = eventRow?.image_url || '/images/affiche-d1.webp';
 
   return (
     <div style={styles.page} className="animate-fade-in">
