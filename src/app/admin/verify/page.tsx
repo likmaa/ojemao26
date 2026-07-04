@@ -1,12 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { verifyPass } from '@/app/lib/admin-actions';
 import { Html5QrcodeScanner } from 'html5-qrcode';
 import Link from 'next/link';
 
-export default function VerifyPage() {
+function VerifyContent() {
   const searchParams = useSearchParams();
   const idFromUrl = searchParams.get('id');
   
@@ -169,5 +169,13 @@ export default function VerifyPage() {
 
       </div>
     </div>
+  );
+}
+
+export default function VerifyPage() {
+  return (
+    <Suspense fallback={<div style={{ textAlign: 'center', padding: '3rem' }}>Chargement...</div>}>
+      <VerifyContent />
+    </Suspense>
   );
 }
