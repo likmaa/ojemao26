@@ -161,3 +161,14 @@ a {
   padding: 0.35rem 0.85rem;
   border-radius: 0 !important;
 }
+
+/* Responsive Header */
+@media (max-width: 900px) {
+  header nav {
+    display: none !important; /* Hide desktop nav */
+  }
+  header button {
+    display: flex !important; /* Show mobile burger */
+  }
+}
+

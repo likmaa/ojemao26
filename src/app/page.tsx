@@ -25,7 +25,7 @@ export default function UnderConstruction() {
           </h1>
           
           <p style={styles.location}>
-            📍 Cotonou, Bénin — ONG Direct Aid | 📅 25 au 28 Juillet 2026
+            📍 Cotonou, Bénin — ONG Direct Aid | 📅 25 Juil. (Débat) & 26-28 Juil. (Congrès & CIF) 2026
           </p>
 
           <div style={styles.divider}></div>

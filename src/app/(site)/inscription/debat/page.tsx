@@ -2,8 +2,8 @@
 
 import { useActionState, useState } from 'react';
 import Link from 'next/link';
-import { submitInscriptionDebat } from '../../lib/actions';
-import FormField from '../../components/FormField';
+import { submitInscriptionDebat } from '@/app/lib/actions';
+import FormField from '@/app/components/FormField';
 
 export default function InscriptionDebat() {
   const [state, formAction, pending] = useActionState(submitInscriptionDebat, null);
