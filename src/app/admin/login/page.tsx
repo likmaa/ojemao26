@@ -1,13 +1,14 @@
 'use client';
 
-import { useActionState, useEffect } from 'react';
+import { useActionState, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { authenticateAdmin } from '@/app/lib/actions';
-import FormField from '@/app/components/FormField';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 export default function AdminLogin() {
   const [state, formAction, pending] = useActionState(authenticateAdmin, null);
   const router = useRouter();
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     if (state?.success) {
@@ -31,13 +32,49 @@ export default function AdminLogin() {
             </div>
           )}
 
-          <FormField
-            label="Mot de passe d'administration"
-            name="password"
-            type="password"
-            required={true}
-            placeholder="Entrez le mot de passe global"
-          />
+          <div style={{ marginBottom: '1.5rem' }}>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600, color: 'var(--text-dark)' }}>
+              Mot de passe d'administration *
+            </label>
+            <div style={{ position: 'relative' }}>
+              <input
+                type={showPassword ? 'text' : 'password'}
+                name="password"
+                required
+                placeholder="Entrez le mot de passe global"
+                style={{
+                  width: '100%',
+                  padding: '0.8rem 1rem',
+                  paddingRight: '3rem',
+                  borderRadius: '6px',
+                  border: '1px solid #CBD5E1',
+                  background: '#F8FAFC',
+                  fontSize: '1rem',
+                  fontFamily: 'inherit'
+                }}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                style={{
+                  position: 'absolute',
+                  right: '10px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: '#64748B',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '5px'
+                }}
+              >
+                {showPassword ? <FaEyeSlash size={18} /> : <FaEye size={18} />}
+              </button>
+            </div>
+          </div>
 
           <button
             type="submit"
