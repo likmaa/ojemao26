@@ -119,7 +119,7 @@ export async function sendConfirmationEmail({ to, nom, eventName, details }: Sen
     `;
 
     const { data, error } = await resend.emails.send({
-      from: 'OJEMAO 2026 <onboarding@resend.dev>', 
+      from: 'OJEMAO 2026 <inscription@ojemao26.logtech.tech>', 
       to: [to],
       subject: `Confirmation de votre inscription - ${eventName}`,
       html: htmlContent,
