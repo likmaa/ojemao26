@@ -1,104 +1,115 @@
-import Link from 'next/link';
+'use client';
+
+import { useState, useEffect } from 'react';
+import Image from 'next/image';
+import { supabase } from '@/app/lib/supabase';
+import { FaSpinner } from 'react-icons/fa';
+
+type Category = 'Tous' | 'Dignitaires' | 'Experts' | 'Leaders';
 
 interface Speaker {
+  id: string;
   name: string;
+  title: string;
   role: string;
-  origin: string; // Institution / Country
-  volet: 'Débat' | 'CIF' | 'Tous';
+  category: string;
+  image_url: string;
 }
 
 export default function IntervenantsPage() {
-  const speakers: Speaker[] = [
-    {
-      name: 'Dr. Abdoulaye Salifou',
-      role: 'Universitaire, Enseignant-Chercheur en Sciences de l\'Éducation et Sociologie politique',
-      origin: 'Université d\'Abomey-Calavi (UAC) | Bénin',
-      volet: 'Débat',
-    },
-    {
-      name: 'M. Mouhammadou Sylla',
-      role: 'Coordonnateur Sous-régional de l\'OJEMAO',
-      origin: 'Secrétariat Permanent | Sénégal',
-      volet: 'CIF',
-    },
-    {
-      name: 'Dr. Ibrahim Al-Hassan',
-      role: 'Spécialiste en Droit Islamique et Droits Humains',
-      origin: 'Université de Niamey | Niger',
-      volet: 'Débat',
-    },
-    {
-      name: 'El-Hadj Issa Gounou',
-      role: 'Représentant des Intellectuels et Cadres Musulmans du Bénin',
-      origin: 'Association des Intellectuels Musulmans (AIMB) | Bénin',
-      volet: 'Débat',
-    },
-    {
-      name: 'Mme Fatoumata Diallo',
-      role: 'Consultante en Leadership Associatif et Autonomisation des Jeunes',
-      origin: 'Formatrice Régionale | Mali',
-      volet: 'CIF',
-    },
-    {
-      name: 'M. Abdul-Malik Kouton',
-      role: 'Président d\'ACEEMUB / Organisateur Local',
-      origin: 'Comité National d\'Accueil | Bénin',
-      volet: 'Tous',
-    },
-  ];
+  const [activeFilter, setActiveFilter] = useState<Category>('Tous');
+  const [speakers, setSpeakers] = useState<Speaker[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchSpeakers = async () => {
+      const { data, error } = await supabase
+        .from('speakers')
+        .select('*')
+        .order('created_at', { ascending: true });
+
+      if (!error && data) {
+        setSpeakers(data);
+      } else {
+        console.error('Error fetching speakers:', error);
+      }
+      setLoading(false);
+    };
+    
+    fetchSpeakers();
+  }, []);
+
+  const filteredSpeakers = speakers.filter(
+    (speaker) => activeFilter === 'Tous' || speaker.category === activeFilter || (activeFilter === 'Leaders' && speaker.category.includes('Leaders'))
+  );
 
   return (
-    <div style={styles.page} className="grid-bg theme-dark animate-fade-in">
+    <div className="animate-fade-in" style={styles.page}>
       <div style={styles.container}>
         <header style={styles.header}>
-          <span style={styles.badge} className="badge-solid">Intervenants & Panelistes</span>
-          <h1 style={styles.title}>Les Personnalités Invitées</h1>
+          <span className="badge-solid" style={styles.badge}>Délégations & Modérateurs</span>
+          <h1 style={styles.title}>Les Intervenants</h1>
           <p style={styles.subtitle}>
-            Retrouvez les conférenciers, universitaires et leaders de la jeunesse musulmane d'Afrique de l'Ouest.
+            Découvrez les personnalités, experts et dignitaires qui animeront le Débat de Cotonou et le Congrès CIF.
           </p>
         </header>
 
-        {/* Speakers Grid */}
-        <section style={styles.grid}>
-          {speakers.map((speaker, idx) => (
-            <div key={idx} style={styles.card} className="glass">
-              <div style={styles.cardHeader}>
-                {/* Visual placeholder box to look professional without actual photos */}
-                <div style={styles.avatarPlaceholder}>
-                  <span style={styles.avatarInitials}>
-                    {speaker.name.split(' ').slice(-2).map(n => n[0]).join('')}
-                  </span>
-                </div>
-                <div style={styles.meta}>
-                  <span 
-                    style={{
-                      ...styles.voletBadge,
-                      background: speaker.volet === 'Débat' ? 'rgba(56, 165, 84, 0.15)' : 'rgba(232, 131, 42, 0.15)',
-                      color: speaker.volet === 'Débat' ? '#4ADE80' : '#FDBA74',
-                      border: speaker.volet === 'Débat' ? '1px solid rgba(56, 165, 84, 0.3)' : '1px solid rgba(232, 131, 42, 0.3)',
-                    }}
-                  >
-                    {speaker.volet === 'Tous' ? 'Débat & CIF' : speaker.volet}
-                  </span>
-                </div>
-              </div>
-
-              <div style={styles.cardBody}>
-                <h3 style={styles.name}>{speaker.name}</h3>
-                <p style={styles.role}>{speaker.role}</p>
-                <div style={styles.divider}></div>
-                <p style={styles.origin}>📍 {speaker.origin}</p>
-              </div>
-            </div>
+        {/* Filters */}
+        <div style={styles.filters}>
+          {(['Tous', 'Dignitaires', 'Experts', 'Leaders'] as Category[]).map((category) => (
+            <button
+              key={category}
+              onClick={() => setActiveFilter(category)}
+              style={{
+                ...styles.filterBtn,
+                background: activeFilter === category ? 'var(--primary)' : 'transparent',
+                color: activeFilter === category ? '#FFFFFF' : 'var(--text-dark)',
+                borderColor: activeFilter === category ? 'var(--primary)' : '#E2E8F0',
+              }}
+            >
+              {category}
+            </button>
           ))}
-        </section>
-
-        {/* Bottom Banner */}
-        <div style={styles.bottomBanner} className="glass">
-          <p style={styles.bottomText}>
-            D'autres conférenciers et panélistes de la sous-région (Côte d'Ivoire, Burkina Faso, Togo, Sénégal) seront bientôt ajoutés au fur et à mesure des confirmations de mandat de chaque délégation nationale.
-          </p>
         </div>
+
+        {/* Loading State */}
+        {loading && (
+          <div style={styles.loading}>
+            <FaSpinner className="fa-spin" size={32} color="var(--primary)" />
+            <p style={{ marginTop: '1rem', color: '#64748B' }}>Chargement des intervenants...</p>
+          </div>
+        )}
+
+        {/* Grid */}
+        {!loading && speakers.length > 0 && (
+          <div style={styles.grid} className="speakers-grid">
+            {filteredSpeakers.map((speaker) => (
+              <div key={speaker.id} style={styles.card} className="speaker-card">
+                <div style={styles.imageWrapper}>
+                  <Image
+                    src={speaker.image_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(speaker.name)}&background=E2E8F0`}
+                    alt={speaker.name}
+                    fill
+                    style={{ objectFit: 'cover', objectPosition: 'top' }}
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  />
+                </div>
+                <div style={styles.cardContent}>
+                  <span style={styles.categoryBadge}>{speaker.category}</span>
+                  <h3 style={styles.name}>{speaker.name}</h3>
+                  <p style={styles.role}>{speaker.role}</p>
+                  <p style={styles.titleText}>{speaker.title}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+        
+        {!loading && speakers.length === 0 && (
+          <div style={{ textAlign: 'center', padding: '4rem', color: '#64748B' }}>
+            Aucun intervenant n'a été ajouté pour le moment.
+          </div>
+        )}
       </div>
     </div>
   );
@@ -108,117 +119,113 @@ const styles = {
   page: {
     padding: '4rem 0',
     minHeight: '80vh',
+    background: '#F8FAFC',
   },
   container: {
     maxWidth: '1200px',
     margin: '0 auto',
-    padding: '0 2rem',
+    padding: '0 1.5rem',
     width: '100%',
   },
   header: {
-    marginBottom: '3rem',
     textAlign: 'center' as const,
+    marginBottom: '3rem',
   },
   badge: {
-    background: 'rgba(3, 67, 137, 0.15)',
-    border: '1px solid rgba(3, 67, 137, 0.3)',
-    color: 'var(--secondary)',
+    background: 'rgba(56, 165, 84, 0.08)',
+    border: '1px solid rgba(56, 165, 84, 0.2)',
+    color: 'var(--primary)',
     marginBottom: '1rem',
+    display: 'inline-block',
   },
   title: {
     fontFamily: 'var(--font-title)',
     fontSize: '2.5rem',
     fontWeight: '800',
-    color: '#FFFFFF',
+    color: 'var(--text-dark)',
     marginBottom: '0.75rem',
   },
   subtitle: {
     fontSize: '1.05rem',
-    color: '#94A3B8',
-    lineHeight: '1.6',
+    color: 'var(--text-muted)',
     maxWidth: '700px',
     margin: '0 auto',
+    lineHeight: '1.6',
+  },
+  filters: {
+    display: 'flex',
+    justifyContent: 'center',
+    gap: '0.75rem',
+    marginBottom: '3rem',
+    flexWrap: 'wrap' as const,
+  },
+  filterBtn: {
+    padding: '0.6rem 1.2rem',
+    borderRadius: '50px',
+    border: '1px solid',
+    fontSize: '0.9rem',
+    fontWeight: '600',
+    cursor: 'pointer',
+    transition: 'all 0.2s ease',
+    outline: 'none',
   },
   grid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
     gap: '2rem',
-    marginBottom: '4rem',
   },
   card: {
-    padding: '2rem',
+    background: '#FFFFFF',
+    border: '1px solid #E2E8F0',
+    borderRadius: '12px',
+    overflow: 'hidden',
+    transition: 'transform 0.2s ease, box-shadow 0.2s ease',
     display: 'flex',
     flexDirection: 'column' as const,
-    gap: '1.5rem',
-    borderRadius: '0px', // Strict flat
   },
-  cardHeader: {
+  imageWrapper: {
+    position: 'relative' as const,
+    width: '100%',
+    height: '320px',
+    backgroundColor: '#E2E8F0',
+  },
+  cardContent: {
+    padding: '1.5rem',
     display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    flexDirection: 'column' as const,
+    flexGrow: 1,
   },
-  avatarPlaceholder: {
-    width: '64px',
-    height: '64px',
-    background: 'rgba(255, 255, 255, 0.03)',
-    border: '1px solid rgba(255, 255, 255, 0.1)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: '0px', // Sharp
-  },
-  avatarInitials: {
-    fontSize: '1.25rem',
-    fontFamily: 'var(--font-title)',
+  categoryBadge: {
+    fontSize: '0.7rem',
+    textTransform: 'uppercase' as const,
+    letterSpacing: '0.05em',
     fontWeight: '700',
     color: 'var(--accent)',
-    textTransform: 'uppercase' as const,
-  },
-  meta: {},
-  voletBadge: {
-    fontSize: '0.7rem',
-    fontWeight: '600',
-    padding: '0.2rem 0.6rem',
-    borderRadius: '0px',
-  },
-  cardBody: {
-    display: 'flex',
-    flexDirection: 'column' as const,
-    gap: '0.5rem',
+    marginBottom: '0.5rem',
   },
   name: {
     fontFamily: 'var(--font-title)',
     fontSize: '1.25rem',
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: 'var(--text-dark)',
+    marginBottom: '0.25rem',
   },
   role: {
     fontSize: '0.85rem',
-    lineHeight: '1.5',
-    color: '#94A3B8',
-    minHeight: '60px',
-  },
-  divider: {
-    width: '30px',
-    height: '2px',
-    background: 'var(--accent)',
-    margin: '0.5rem 0',
-  },
-  origin: {
-    fontSize: '0.8rem',
     fontWeight: '600',
-    color: '#E2E8F0',
+    color: 'var(--primary)',
+    marginBottom: '0.5rem',
   },
-  bottomBanner: {
-    padding: '2rem',
-    textAlign: 'center' as const,
-    border: '1px dashed rgba(255, 255, 255, 0.1)',
+  titleText: {
+    fontSize: '0.9rem',
+    color: 'var(--text-muted)',
+    lineHeight: '1.5',
   },
-  bottomText: {
-    fontSize: '0.85rem',
-    lineHeight: '1.6',
-    color: '#94A3B8',
-    maxWidth: '800px',
-    margin: '0 auto',
-  },
+  loading: {
+    display: 'flex',
+    flexDirection: 'column' as const,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '4rem',
+  }
 };

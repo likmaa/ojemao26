@@ -15,6 +15,12 @@ const outfit = Outfit({
 export const metadata: Metadata = {
   title: "Débat de Cotonou & Congrès OJEMAO 2026",
   description: "Site officiel des événements OJEMAO 2026 à Cotonou, Bénin. Débat de Cotonou (25 Juillet) et Congrès & Colloque d'Afrique de l'Ouest (26 au 28 Juillet).",
+  formatDetection: {
+    telephone: false,
+    date: false,
+    email: false,
+    address: false,
+  },
 };
 
 export default function RootLayout({

@@ -14,7 +14,9 @@ export default function Countdown() {
 
   useEffect(() => {
     // Target date: July 25, 2026 at 09:00:00 (Benin Time GMT+1)
-    const targetDate = new Date('2026-07-25T09:00:00+01:00').getTime();
+    // Using explicit parameters to avoid parsing errors on older mobile browsers (like Android 7)
+    // Month is 0-indexed, so 6 is July.
+    const targetDate = new Date(2026, 6, 25, 9, 0, 0).getTime();
 
     const calculateTimeLeft = () => {
       const now = new Date().getTime();
@@ -47,7 +49,7 @@ export default function Countdown() {
     // Skeleton state to prevent layout shift before hydration
     return (
       <div style={styles.container}>
-        <div style={styles.grid}>
+        <div className="countdown-grid">
           {[1, 2, 3, 4].map((i) => (
             <div key={i} style={styles.cardSkeleton}>
               <span style={styles.number}>--</span>
@@ -61,7 +63,7 @@ export default function Countdown() {
 
   return (
     <div style={styles.container}>
-      <div style={styles.grid}>
+      <div className="countdown-grid">
         <div style={styles.card}>
           <span style={styles.number}>{String(timeLeft.days).padStart(2, '0')}</span>
           <span style={styles.label}>Jours</span>
@@ -92,36 +94,34 @@ const styles = {
   },
   grid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(4, minmax(80px, 110px))',
+    gridTemplateColumns: 'repeat(4, minmax(80px, 120px))',
     gap: '1rem',
     justifyContent: 'center',
     width: '100%',
   },
   card: {
-    background: 'rgba(255, 255, 255, 0.04)',
-    border: '1px solid rgba(255, 255, 255, 0.08)',
-    borderRadius: '0px',
+    background: '#F8FAFC',
+    border: '1px solid #E2E8F0',
+    borderRadius: '6px',
     padding: '1.25rem 0.5rem',
     display: 'flex',
     flexDirection: 'column' as const,
     alignItems: 'center',
-    boxShadow: 'var(--shadow-lg)',
-    backdropFilter: 'blur(8px)',
   },
   cardSkeleton: {
-    background: 'rgba(255, 255, 255, 0.02)',
-    border: '1px solid rgba(255, 255, 255, 0.04)',
-    borderRadius: '0px',
+    background: '#F1F5F9',
+    border: '1px solid #E2E8F0',
+    borderRadius: '6px',
     padding: '1.25rem 0.5rem',
     display: 'flex',
     flexDirection: 'column' as const,
     alignItems: 'center',
   },
   number: {
-    fontFamily: 'var(--font-outfit)',
-    fontSize: '2.25rem',
+    fontFamily: 'var(--font-title)',
+    fontSize: '2.5rem',
     fontWeight: '700',
-    color: 'var(--accent)',
+    color: 'var(--primary)',
     lineHeight: '1',
     marginBottom: '0.5rem',
   },
@@ -129,8 +129,7 @@ const styles = {
     fontSize: '0.75rem',
     textTransform: 'uppercase' as const,
     letterSpacing: '0.1em',
-    color: 'var(--text-light)',
-    opacity: 0.8,
-    fontWeight: '500',
+    color: 'var(--text-muted)',
+    fontWeight: '700',
   },
 };

@@ -5,17 +5,16 @@
   --secondary-hover: #023368;
   --accent: #E8832A;
   --accent-hover: #C96F1D;
-  --background-dark: #02142B;
-  --background-light: #fefefe;
-  --white: #fefefe;
+  --background: #FFFFFF;
+  --white: #FFFFFF;
   
   --text-dark: #0A1628;
   --text-muted: #475569;
   --text-light: #F1F5F9;
   
-  /* Fonts Stack: Seravek is default on macOS/iOS, Glancyr will fallback to Outfit */
-  --font-body: 'Seravek', var(--font-inter), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  --font-title: 'Glancyr', var(--font-outfit), -apple-system, sans-serif;
+  /* Fonts Stack: Consistent Google Fonts across all devices */
+  --font-body: var(--font-inter), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-title: var(--font-outfit), -apple-system, sans-serif;
   
   /* Institutional Minimalist: strictly no rounded corners */
   --radius-sm: 0px;
@@ -24,6 +23,7 @@
   --radius-xl: 0px;
   
   --border-width: 1px;
+  --border-color: #E2E8F0;
 }
 
 * {
@@ -42,16 +42,10 @@ body {
   display: flex;
   flex-direction: column;
   color: var(--text-dark);
-  background-color: var(--background-light);
+  background-color: var(--background);
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-/* Base styles for dark pages / sections */
-.theme-dark {
-  background-color: var(--background-dark);
-  color: var(--white);
 }
 
 a {
@@ -70,27 +64,18 @@ a {
   animation: fadeIn 0.4s ease-out forwards;
 }
 
-/* Grid background for institutional dark feel */
-.grid-bg {
-  background-color: var(--background-dark);
-  background-image: 
-    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-  background-size: 40px 40px;
-}
-
 /* Simple helper classes */
 .container {
   width: 100%;
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 0 2rem;
+  padding: 0 1.5rem;
 }
 
-/* Structured minimalist card (no rounded corners, solid border) */
+/* Clean light card style */
 .glass {
-  background: rgba(255, 255, 255, 0.02);
-  border: var(--border-width) solid rgba(255, 255, 255, 0.1);
+  background: #FFFFFF;
+  border: none;
 }
 
 /* Forms and interactive components */
@@ -110,7 +95,7 @@ a {
   font-size: 0.95rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  border-radius: 0 !important;
+  border-radius: 6px !important;
   border: none;
   cursor: pointer;
   transition: background-color 0.15s ease;
@@ -136,13 +121,13 @@ a {
 
 .btn-secondary {
   background-color: transparent;
-  color: var(--white);
-  border: var(--border-width) solid rgba(255, 255, 255, 0.2);
+  color: var(--secondary);
+  border: var(--border-width) solid var(--border-color);
 }
 
 .btn-secondary:hover {
-  background-color: rgba(255, 255, 255, 0.05);
-  border-color: var(--white);
+  background-color: #F8FAFC;
+  border-color: var(--secondary);
 }
 
 .btn:disabled {
@@ -162,13 +147,187 @@ a {
   border-radius: 0 !important;
 }
 
-/* Responsive Header */
+/* Responsive Header and Layout */
+.mobile-toggle {
+  display: none !important; /* Hidden on desktop by default */
+}
+
 @media (max-width: 900px) {
-  header nav {
+  .desktop-nav {
     display: none !important; /* Hide desktop nav */
   }
-  header button {
+  .mobile-toggle {
     display: flex !important; /* Show mobile burger */
+  }
+  .details-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+  .glass {
+    border: none !important; /* Remove the gray grid borders on mobile */
+    background: transparent !important;
+  }
+  .main-content-box {
+    padding: 1rem 0 !important; /* Remove padding to free up space on mobile */
+  }
+  .sidebar-box {
+    padding: 1.5rem 0 !important;
+  }
+  .schedule-item {
+    grid-template-columns: 1fr !important;
+    padding: 1.5rem 0 !important;
+    gap: 1rem !important;
+  }
+  .time-col {
+    margin-bottom: 0.5rem;
   }
 }
 
+.details-grid {
+  display: grid;
+  grid-template-columns: 3fr 1.5fr;
+  gap: 2.5rem;
+  align-items: start;
+}
+
+.schedule-item {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  border-bottom: 1px solid #F1F5F9;
+  padding: 2rem;
+  align-items: start;
+  transition: all 0.2s ease;
+}
+.schedule-item:hover {
+  background-color: #F8FAFC;
+  transform: translateX(4px);
+  border-left: 4px solid var(--primary);
+}
+
+.speaker-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.speaker-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+/* Responsive Countdown */
+.countdown-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(80px, 120px));
+  gap: 1rem;
+  justify-content: center;
+  width: 100%;
+}
+
+@media (max-width: 450px) {
+  .countdown-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.5rem;
+  }
+  .countdown-grid span:first-child {
+    font-size: 1.75rem !important;
+  }
+  .countdown-grid span:last-child {
+    font-size: 0.6rem !important;
+  }
+  
+  /* Timeline responsive fix for very small phones */
+  .timelineItem {
+    padding-left: 1rem !important;
+  }
+}
+
+/* Admin Sidebar Responsive Layout */
+@media (min-width: 1024px) {
+  .admin-sidebar {
+    left: 0 !important;
+  }
+  .admin-close-btn {
+    display: none !important;
+  }
+  .mobile-header {
+    display: none !important;
+  }
+  .admin-main {
+    margin-left: 280px !important;
+    padding-top: 2rem !important; /* Reset padding for desktop */
+  }
+}
+
+/* Spinner Animation */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.fa-spin {
+  animation: spin 1s infinite linear;
+}
+
+/* Marquee / Infinite Slider */
+.marquee-container {
+  overflow: hidden;
+  white-space: nowrap;
+  width: 100%;
+  padding: 1rem 0;
+  position: relative;
+}
+
+.marquee-container::before,
+.marquee-container::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 100px;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+}
+.marquee-container::before {
+  left: 0;
+  background: linear-gradient(to right, #F8FAFC 0%, transparent 100%);
+}
+.marquee-container::after {
+  right: 0;
+  background: linear-gradient(to left, #F8FAFC 0%, transparent 100%);
+}
+
+.marquee-track {
+  display: flex;
+  gap: 2rem;
+  width: max-content;
+  animation: marquee 35s linear infinite;
+}
+
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+
+.marquee-item {
+  flex-shrink: 0;
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* react-phone-number-input overrides */
+.PhoneInputInput {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  padding: 0;
+}
+.PhoneInputInput:focus {
+  outline: none;
+}
+.PhoneInputCountry {
+  margin-right: 0.75rem;
+}

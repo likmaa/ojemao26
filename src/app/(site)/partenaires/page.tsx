@@ -1,36 +1,48 @@
+import Image from 'next/image';
 import Link from 'next/link';
 
 export default function PartenairesPage() {
-  const partners = [
-    { name: 'AIMB', role: 'Porteur Principal Académique', details: 'Association des Intellectuels Musulmans du Bénin' },
-    { name: 'ACEEMUB', role: 'Coorganisateur Local & Logistique', details: 'Association Culturelle et Éducative des Élèves et Étudiants Musulmans du Bénin' },
-    { name: 'OJEMAO', role: 'Organisation de Tutelle Régionale', details: 'Organisation de la Jeunesse Musulmane en Afrique de l\'Ouest' },
-    { name: 'RAI-Bénin', role: 'Co-porteur Citoyen & Mobilisation', details: 'Réseau des Associations Islamiques du Bénin' },
-    { name: 'Direct Aid', role: 'Partenaire d\'Accueil & Lieu', details: 'ONG Internationale de Bienfaisance et d\'Éducation' },
+  const logos = [
+    '307697944_422326529983064_7008464641129287907_n-removebg-preview.png',
+    '310606857_6168992549794905_2704647731196745770_n-removebg-preview.png',
+    'télécharger-removebg-preview (2).png',
+    'télécharger__1_-removebg-preview (2).png',
+    'télécharger__2_-removebg-preview.png',
+    'télécharger__3_-removebg-preview (1).png',
+    'télécharger__3_-removebg-preview.png',
+    'télécharger__4_-removebg-preview.png'
+  ];
+
+  const organizers = [
+    { name: 'OJEMAO', logo: '/images/organisateurs/logo_ojemao.png', role: 'Organisation de Tutelle Régionale', details: "Organisation de la Jeunesse Musulmane en Afrique de l'Ouest" },
+    { name: 'AIMB', logo: '/images/organisateurs/logo_aimb.png', role: 'Organisateur Local et stratégique', details: 'Amicale des Intellectuels Musulmans du Bénin' },
+    { name: 'ACEEMUB (UIB)', logo: '/images/organisateurs/logo_aceemub.png', role: 'Coorganisateur Local & Logistique', details: 'Association Culturelle et des Élèves et Étudiants Musulmans du Bénin' },
+    { name: 'RAI-Bénin', logo: '/images/organisateurs/logo_raibenin.png', role: 'Co-porteur Citoyen & Mobilisation', details: 'Réseau des Associations et ONGs Islamiques du Bénin' },
   ];
 
   return (
-    <div style={styles.page} className="grid-bg theme-dark animate-fade-in">
+    <div className="animate-fade-in" style={styles.page}>
       <div style={styles.container}>
         <header style={styles.header}>
-          <span style={styles.badge} className="badge-solid">Soutiens & Alliances</span>
-          <h1 style={styles.title}>Partenaires & Organisateurs</h1>
+          <span className="badge-solid" style={styles.badge}>Ils nous soutiennent</span>
+          <h1 style={styles.title}>Nos Partenaires</h1>
           <p style={styles.subtitle}>
-            Les institutions et organisations engagées pour la réussite du Débat de Cotonou et du Congrès OJEMAO 2026.
+            Le Débat de Cotonou et le Congrès CIF sont rendus possibles grâce au soutien de nos précieux partenaires institutionnels, médias et privés.
           </p>
         </header>
 
-        {/* Founding Partners list */}
-        <section style={styles.section} className="glass">
+        {/* Organizers Section */}
+        <section style={styles.section}>
           <h2 style={styles.sectionTitle}>Comité d'Organisation Principal</h2>
           <div style={styles.partnerList}>
-            {partners.map((p, idx) => (
+            {organizers.map((p, idx) => (
               <div key={idx} style={styles.partnerRow}>
                 <div style={styles.logoBox}>
-                  <span style={styles.logoPlaceholder}>{p.name}</span>
+                  <Image src={p.logo} alt={p.name} fill style={{ objectFit: 'contain' }} />
                 </div>
                 <div style={styles.partnerDetails}>
-                  <h3 style={styles.partnerName}>{p.role}</h3>
+                  <h3 style={styles.partnerRole}>{p.role}</h3>
+                  <strong style={styles.partnerName}>{p.name}</strong>
                   <p style={styles.partnerText}>{p.details}</p>
                 </div>
               </div>
@@ -38,16 +50,36 @@ export default function PartenairesPage() {
           </div>
         </section>
 
-        {/* Sponsorship Grid */}
         <section style={styles.section}>
-          <h2 style={styles.sectionTitle}>Grille de Sponsoring & Visibilité</h2>
-          <p style={styles.text}>
-            Devenez partenaire officiel de ces événements phares d'envergure sous-régionale et bénéficiez d'une visibilité ciblée auprès de centaines de cadres, d'universitaires, d'intellectuels et de jeunes leaders d'Afrique de l'Ouest.
-          </p>
+          <div className="marquee-container">
+            <div className="marquee-track">
+              {[...logos, ...logos].map((logo, index) => (
+                <div key={index} className="marquee-item" style={styles.logoCard}>
+                  <Image
+                    src={`/partenaires/${logo}`}
+                    alt={`Partenaire ${index + 1}`}
+                    fill
+                    style={{ objectFit: 'contain', padding: '1rem' }}
+                    sizes="(max-width: 768px) 50vw, 33vw"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Sponsorship Grid */}
+        <section style={styles.sponsorshipSection}>
+          <div style={styles.sponsorshipHeader}>
+            <h2 style={styles.sectionTitle}>Grille de Sponsoring & Visibilité</h2>
+            <p style={styles.sponsorshipText}>
+              Devenez partenaire officiel de ces événements phares d'envergure sous-régionale et bénéficiez d'une visibilité ciblée auprès de centaines de cadres, d'universitaires, d'intellectuels et de jeunes leaders d'Afrique de l'Ouest.
+            </p>
+          </div>
 
           <div style={styles.sponsorshipGrid}>
             {/* Pack 1 */}
-            <div style={styles.packCard} className="glass">
+            <div style={styles.packCard} className="hover-lift">
               <span style={styles.packType}>Pack Partenaire</span>
               <h3 style={styles.packTitle}>Partenaire Majeur</h3>
               <ul style={styles.packList}>
@@ -59,7 +91,7 @@ export default function PartenairesPage() {
             </div>
 
             {/* Pack 2 */}
-            <div style={{ ...styles.packCard, borderLeft: '4px solid var(--accent)' }} className="glass">
+            <div style={{ ...styles.packCard, borderTop: '4px solid var(--accent)' }} className="hover-lift">
               <span style={{ ...styles.packType, color: 'var(--accent)' }}>Pack Visibilité</span>
               <h3 style={styles.packTitle}>Soutien Officiel</h3>
               <ul style={styles.packList}>
@@ -72,16 +104,20 @@ export default function PartenairesPage() {
           </div>
         </section>
 
-        {/* Contact/CTA */}
-        <div style={styles.contactBanner} className="glass">
-          <h3 style={styles.contactTitle}>Rejoindre le réseau des partenaires</h3>
-          <p style={styles.contactText}>
-            Pour recevoir notre dossier de partenariat officiel ou discuter d'une collaboration sur mesure :
+        <div style={styles.callToAction}>
+          <h2 style={styles.ctaTitle}>Devenir Partenaire</h2>
+          <p style={styles.ctaText}>
+            Vous souhaitez associer l'image de votre organisation à un événement prestigieux de portée internationale ?
           </p>
-          <div style={styles.contactDetails}>
-            <p>📧 Email : <strong>partenaires@ojemao26.logtech.tech</strong></p>
-            <p>📞 Secrétariat du comité : <strong>+229 90 00 00 00</strong></p>
-          </div>
+          <a 
+            href="https://wa.me/2290169506246?text=Bonjour,%20je%20souhaite%20avoir%20plus%20d'informations%20sur%20les%20opportunit%C3%A9s%20de%20partenariat%20pour%20l'OJEMAO%202026." 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            style={styles.ctaButton} 
+            className="btn"
+          >
+            Contactez-nous sur WhatsApp
+          </a>
         </div>
       </div>
     </div>
@@ -90,117 +126,142 @@ export default function PartenairesPage() {
 
 const styles = {
   page: {
-    padding: '4rem 0',
-    minHeight: '80vh',
+    padding: '4rem 1.5rem',
+    backgroundColor: '#F8FAFC',
+    minHeight: '100vh',
   },
   container: {
-    maxWidth: '900px',
+    maxWidth: '1200px',
     margin: '0 auto',
-    padding: '0 2rem',
-    width: '100%',
   },
   header: {
-    marginBottom: '3rem',
     textAlign: 'center' as const,
+    marginBottom: '4rem',
   },
   badge: {
-    background: 'rgba(56, 165, 84, 0.15)',
-    border: '1px solid rgba(56, 165, 84, 0.3)',
-    color: 'var(--primary)',
     marginBottom: '1rem',
   },
   title: {
     fontFamily: 'var(--font-title)',
     fontSize: '2.5rem',
     fontWeight: '800',
-    color: '#FFFFFF',
-    marginBottom: '0.75rem',
+    color: 'var(--text-dark)',
+    marginBottom: '1rem',
   },
   subtitle: {
-    fontSize: '1.05rem',
-    color: '#94A3B8',
+    fontSize: '1.1rem',
+    color: 'var(--text-muted)',
+    maxWidth: '700px',
+    margin: '0 auto',
     lineHeight: '1.6',
   },
   section: {
-    marginBottom: '3rem',
-    padding: '2.5rem',
+    marginBottom: '4rem',
   },
   sectionTitle: {
     fontFamily: 'var(--font-title)',
     fontSize: '1.5rem',
     fontWeight: '700',
-    color: '#FFFFFF',
-    marginBottom: '1.5rem',
-    borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
-    paddingBottom: '0.75rem',
-  },
-  text: {
-    fontSize: '0.95rem',
-    lineHeight: '1.6',
-    color: '#94A3B8',
+    color: 'var(--text-dark)',
     marginBottom: '2rem',
+    borderBottom: '1px solid #E2E8F0',
+    paddingBottom: '0.75rem',
   },
   partnerList: {
     display: 'flex',
     flexDirection: 'column' as const,
     gap: '1.5rem',
+    marginBottom: '3rem',
   },
   partnerRow: {
     display: 'flex',
     gap: '1.5rem',
     alignItems: 'center',
     paddingBottom: '1.25rem',
-    borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
-    ':last-child': {
-      borderBottom: 'none',
-      paddingBottom: 0,
-    },
-    '@media (max-width: 600px)': {
-      flexDirection: 'column' as const,
-      alignItems: 'flex-start',
-      gap: '0.75rem',
-    },
+    borderBottom: '1px solid #F1F5F9',
   },
   logoBox: {
+    position: 'relative' as const,
     width: '120px',
-    height: '50px',
-    background: 'rgba(255, 255, 255, 0.02)',
-    border: '1px solid rgba(255, 255, 255, 0.08)',
+    height: '80px',
+    backgroundColor: '#FFFFFF',
+    border: '1px solid #E2E8F0',
+    borderRadius: '8px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     flexShrink: 0,
+    padding: '0.5rem',
   },
-  logoPlaceholder: {
-    fontFamily: 'var(--font-title)',
-    fontWeight: '700',
-    color: '#FFFFFF',
-    fontSize: '0.9rem',
-    letterSpacing: '0.05em',
+  partnerDetails: {
+    display: 'flex',
+    flexDirection: 'column' as const,
   },
-  partnerDetails: {},
-  partnerName: {
+  partnerRole: {
     fontFamily: 'var(--font-title)',
     fontSize: '1.1rem',
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: 'var(--primary)',
+    marginBottom: '0.25rem',
+  },
+  partnerName: {
+    fontSize: '1rem',
+    color: 'var(--text-dark)',
     marginBottom: '0.25rem',
   },
   partnerText: {
-    fontSize: '0.85rem',
-    color: '#94A3B8',
+    fontSize: '0.9rem',
+    color: 'var(--text-muted)',
+  },
+  grid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+    gap: '2rem',
+    alignItems: 'center',
+    justifyItems: 'center',
+  },
+  logoCard: {
+    position: 'relative' as const,
+    width: '250px',
+    aspectRatio: '3/2',
+    backgroundColor: '#FFFFFF',
+    borderRadius: '12px',
+    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)',
+    transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+    overflow: 'hidden',
+    border: '1px solid #E2E8F0',
+    cursor: 'pointer',
+  },
+  sponsorshipSection: {
+    padding: '4rem 0',
+    borderTop: '1px solid #E2E8F0',
+  },
+  sponsorshipHeader: {
+    textAlign: 'center' as const,
+    marginBottom: '3rem',
+  },
+  sponsorshipText: {
+    fontSize: '1.1rem',
+    color: 'var(--text-muted)',
+    maxWidth: '800px',
+    margin: '0 auto',
+    lineHeight: '1.6',
   },
   sponsorshipGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-    gap: '1.5rem',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+    gap: '2rem',
   },
   packCard: {
-    padding: '2rem',
-    borderLeft: '4px solid var(--primary)',
+    backgroundColor: '#FFFFFF',
+    padding: '2.5rem',
+    borderRadius: '16px',
+    border: '1px solid #E2E8F0',
+    borderTop: '4px solid var(--primary)',
+    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)',
   },
   packType: {
-    fontSize: '0.7rem',
+    fontSize: '0.8rem',
     fontWeight: '700',
     color: 'var(--primary)',
     textTransform: 'uppercase' as const,
@@ -210,41 +271,54 @@ const styles = {
   },
   packTitle: {
     fontFamily: 'var(--font-title)',
-    fontSize: '1.25rem',
-    fontWeight: '700',
-    color: '#FFFFFF',
-    marginBottom: '1.25rem',
+    fontSize: '1.5rem',
+    fontWeight: '800',
+    color: 'var(--text-dark)',
+    marginBottom: '1.5rem',
   },
   packList: {
+    listStyleType: 'disc',
     paddingLeft: '1.25rem',
     display: 'flex',
     flexDirection: 'column' as const,
-    gap: '0.5rem',
-    fontSize: '0.85rem',
-    color: '#94A3B8',
+    gap: '0.75rem',
+    fontSize: '0.95rem',
+    color: 'var(--text-muted)',
     lineHeight: '1.5',
   },
-  contactBanner: {
-    padding: '2.5rem',
-    borderLeft: '4px solid var(--primary)',
+  callToAction: {
+    backgroundColor: 'var(--text-dark)',
+    color: '#FFFFFF',
+    padding: '4rem 2rem',
+    borderRadius: '24px',
+    textAlign: 'center' as const,
+    marginTop: '6rem',
+    backgroundImage: 'linear-gradient(135deg, #0A1628 0%, #1E293B 100%)',
+    boxShadow: '0 20px 40px rgba(0, 0, 0, 0.1)',
   },
-  contactTitle: {
+  ctaTitle: {
+    fontSize: '2rem',
+    fontWeight: '800',
+    marginBottom: '1rem',
     fontFamily: 'var(--font-title)',
-    fontSize: '1.25rem',
-    fontWeight: '700',
     color: '#FFFFFF',
-    marginBottom: '0.75rem',
   },
-  contactText: {
-    fontSize: '0.9rem',
+  ctaText: {
+    fontSize: '1.1rem',
     color: '#94A3B8',
-    marginBottom: '1.25rem',
+    maxWidth: '600px',
+    margin: '0 auto 2.5rem auto',
+    lineHeight: '1.6',
   },
-  contactDetails: {
-    display: 'flex',
-    flexDirection: 'column' as const,
-    gap: '0.5rem',
-    fontSize: '0.9rem',
+  ctaButton: {
+    display: 'inline-block',
+    backgroundColor: 'var(--accent)',
     color: '#FFFFFF',
-  },
+    padding: '1rem 2.5rem',
+    borderRadius: '50px',
+    fontWeight: '600',
+    textDecoration: 'none',
+    transition: 'all 0.3s ease',
+    boxShadow: '0 4px 14px rgba(220, 38, 38, 0.4)',
+  }
 };

@@ -9,6 +9,9 @@ export interface InscriptionDebatInput {
   email: string;
   organe_presse?: string;
   participer_cif: string; // 'oui' | 'non'
+  poste?: string;
+  immatriculation?: string;
+  numero_chaise?: number;
 }
 
 export interface InscriptionCifInput {

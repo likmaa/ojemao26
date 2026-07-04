@@ -1,20 +1,36 @@
 import Link from 'next/link';
+import Image from 'next/image';
+import { FaUsers, FaClock, FaCalendarAlt, FaMapMarkerAlt, FaTicketAlt, FaInfoCircle } from 'react-icons/fa';
+import { supabase } from '@/app/lib/supabase';
 
-export default function CifPage() {
+export const revalidate = 0;
+
+export default async function CifPage() {
+  const { data: eventRow } = await supabase.from('events').select('image_url').eq('title', 'cif').maybeSingle();
+  const cifImage = eventRow?.image_url || '/images/affiche-co1.jpg';
+
   return (
-    <div style={styles.page} className="grid-bg theme-dark animate-fade-in">
+    <div style={styles.page} className="animate-fade-in">
       <div style={styles.container}>
-        <header style={styles.header}>
-          <span style={styles.badge} className="badge-solid">Volet Formatif & Statutaire</span>
+        <header style={{ ...styles.header, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <h1 style={styles.title}>Congrès & Colloque (CIF) 2026</h1>
-          <p style={styles.subtitle}>
+          <p style={{ ...styles.subtitle, textAlign: 'center' }}>
             Le rassemblement régional de la jeunesse musulmane pour se former, échanger et statuer.
           </p>
         </header>
 
         {/* Details Grid */}
-        <section style={styles.detailsGrid}>
-          <div style={styles.mainContent} className="glass">
+        <section className="details-grid">
+          <div style={styles.mainContent} className="glass main-content-box">
+            <div style={{ width: '100%', marginBottom: '2.5rem', textAlign: 'center', backgroundColor: '#F8FAFC', borderRadius: '12px', padding: '1rem', border: '1px solid #E2E8F0' }}>
+              <Image
+                src={cifImage}
+                alt="Affiche Officielle Colloque et Congrès"
+                width={800}
+                height={800}
+                style={{ maxWidth: '100%', height: 'auto', maxHeight: '500px', objectFit: 'contain', borderRadius: '8px' }}
+              />
+            </div>
             <h2 style={styles.sectionTitle}>Présentation des deux Volets</h2>
             
             {/* Volet 1: Colloque CIF */}
@@ -29,6 +45,38 @@ export default function CifPage() {
               <p style={styles.text}>
                 L'objectif est d'outiller la jeunesse avec le concept du juste milieu (Wasatiyya) afin de prévenir les dérives extrémistes et de stimuler un engagement social et spirituel constructif.
               </p>
+              
+              <h4 style={{ ...styles.subTitle, marginTop: '2.5rem' }}><FaUsers style={{ marginRight: '0.5rem', color: 'var(--primary)' }} /> Les 7 Panels Thématiques</h4>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1rem', marginTop: '1rem' }}>
+                <div style={styles.panelCard}>
+                  <h5 style={styles.panelTitle}>Panel 1</h5>
+                  <p style={styles.panelDesc}>Conversations avec la Jeunesse Ouest-Africaine</p>
+                </div>
+                <div style={styles.panelCard}>
+                  <h5 style={styles.panelTitle}>Panel 2</h5>
+                  <p style={styles.panelDesc}>Fondements théologiques de la Oumma Wasatiyya</p>
+                </div>
+                <div style={styles.panelCard}>
+                  <h5 style={styles.panelTitle}>Panel 3</h5>
+                  <p style={styles.panelDesc}>Jeunesse musulmane & équilibre identitaire</p>
+                </div>
+                <div style={styles.panelCard}>
+                  <h5 style={styles.panelTitle}>Panel 4</h5>
+                  <p style={styles.panelDesc}>Médianité et prévention des extrémismes</p>
+                </div>
+                <div style={styles.panelCard}>
+                  <h5 style={styles.panelTitle}>Panel 5</h5>
+                  <p style={styles.panelDesc}>Islam, citoyenneté et cohésion sociale en Afrique de l’Ouest</p>
+                </div>
+                <div style={styles.panelCard}>
+                  <h5 style={styles.panelTitle}>Panel 6</h5>
+                  <p style={styles.panelDesc}>Défis socio-économiques et autonomisation des jeunes</p>
+                </div>
+                <div style={styles.panelCard}>
+                  <h5 style={styles.panelTitle}>Panel 7</h5>
+                  <p style={styles.panelDesc}>Gouvernance et renforcement des organisations de jeunesse</p>
+                </div>
+              </div>
             </div>
 
             <div style={styles.sectionDivider}></div>
@@ -43,32 +91,93 @@ export default function CifPage() {
                 Il sera consacré aux séances d'évaluation, à la présentation des bilans d'activité et financiers, aux réformes des textes et à l'élection du nouveau bureau exécutif de l'organisation.
               </p>
             </div>
+
+            <div style={styles.sectionDivider}></div>
+
+            <h3 style={styles.subTitle}><FaClock style={{ marginRight: '0.5rem', color: 'var(--accent)' }} /> Chronogramme Synthétique (3 Jours)</h3>
+            
+            <div style={styles.timeline}>
+              {/* Jour 1 */}
+              <div style={styles.timelineItem} className="timelineItem">
+                <div style={styles.timelineDot}></div>
+                <div style={styles.timelineTime}>Jour 1 (26 Juillet)</div>
+                <div style={styles.timelineContent}>
+                  <strong>Fondements de la Oumma Wasatiyya et enjeux contemporains</strong>
+                  <ul style={styles.timelineSubList}>
+                    <li>Matinée : Cérémonie d'ouverture, Conférence inaugurale et Panel 1</li>
+                    <li>Après-midi : Panels 2 et 3</li>
+                    <li>Soirée : Dîner, rencontres inter-pays et soirées culturelles</li>
+                  </ul>
+                </div>
+              </div>
+              
+              {/* Jour 2 */}
+              <div style={styles.timelineItem} className="timelineItem">
+                <div style={styles.timelineDot}></div>
+                <div style={styles.timelineTime}>Jour 2 (27 Juillet)</div>
+                <div style={styles.timelineContent}>
+                  <strong>Prévention des extrémismes, cohésion sociale et engagement</strong>
+                  <ul style={styles.timelineSubList}>
+                    <li>Matinée : Panels 4, 5 et 6</li>
+                    <li>Après-midi : Deux séries d'Ateliers de Formation Pratiques en parallèle</li>
+                    <li>Soirée : Élections statutaires (pour les congressistes)</li>
+                  </ul>
+                </div>
+              </div>
+
+              {/* Jour 3 */}
+              <div style={styles.timelineItem} className="timelineItem">
+                <div style={styles.timelineDot}></div>
+                <div style={styles.timelineTime}>Jour 3 (28 Juillet)</div>
+                <div style={styles.timelineContent}>
+                  <strong>Gouvernance, stratégies et Clôture</strong>
+                  <ul style={styles.timelineSubList}>
+                    <li>Matinée : Panel 7 et Session Stratégique (Plan d'action 2026-2028)</li>
+                    <li>Après-midi : Adoption du plan d'action, Cérémonie de Clôture</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div style={styles.sidebar}>
             {/* Info Box */}
-            <div style={styles.sidebarBox} className="glass">
+            <div style={styles.sidebarBox} className="glass sidebar-box">
               <h3 style={styles.sidebarTitle}>Informations Clés</h3>
               <div style={styles.infoItem}>
-                <span style={styles.infoLabel}>📅 DATES</span>
+                <span style={styles.infoLabel}><FaCalendarAlt style={{ marginRight: '0.4rem' }} /> DATES</span>
                 <span style={styles.infoVal}>Dim. 26 au Mar. 28 Juillet 2026</span>
               </div>
               <div style={styles.infoItem}>
-                <span style={styles.infoLabel}>📍 LIEU</span>
-                <span style={styles.infoVal}>Cotonou, Siège de l'ONG Direct Aid</span>
+                <span style={styles.infoLabel}><FaMapMarkerAlt style={{ marginRight: '0.4rem' }} /> LIEU</span>
+                <span style={styles.infoVal}>Direct'Aid Fidjrossè (Ex AMA), Cotonou</span>
               </div>
               <div style={styles.infoItem}>
-                <span style={styles.infoLabel}>🎫 ACCÈS COLLOQUE</span>
+                <span style={styles.infoLabel}><FaTicketAlt style={{ marginRight: '0.4rem' }} /> ACCÈS COLLOQUE</span>
                 <span style={styles.infoVal}>Sur réservation (Paiement sur place)</span>
               </div>
               <div style={styles.infoItem}>
-                <span style={styles.infoLabel}>🗳️ ACCÈS CONGRÈS</span>
+                <span style={styles.infoLabel}><FaInfoCircle style={{ marginRight: '0.4rem' }} /> ACCÈS CONGRÈS</span>
                 <span style={styles.infoVal}>Réservé aux délégués mandatés</span>
+              </div>
+              
+              <div style={{ marginTop: '1.5rem' }}>
+                <span style={styles.infoLabel}><FaMapMarkerAlt style={{ marginRight: '0.4rem' }} /> CARTE DE LOCALISATION</span>
+                <iframe
+                  src="https://maps.google.com/maps?q=Direct%20Aid%20Fidjrosse%20Cotonou&t=&z=15&ie=UTF8&iwloc=&output=embed"
+                  width="100%"
+                  height="200"
+                  style={{ border: 0, borderRadius: '8px', marginTop: '0.5rem', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title="Carte Direct Aid Fidjrossè"
+                ></iframe>
               </div>
             </div>
 
             {/* CTA Box */}
-            <div style={{ ...styles.sidebarBox, borderLeft: '4px solid var(--accent)', background: 'rgba(232, 131, 42, 0.05)' }} className="glass">
+            <div style={{ ...styles.sidebarBox, borderLeft: '4px solid var(--accent)', background: 'rgba(232, 131, 42, 0.03)' }} className="glass sidebar-box">
               <h3 style={styles.sidebarTitle}>Faire ma réservation</h3>
               <p style={styles.sidebarText}>
                 Pour participer au Colloque (panels, ateliers et matériel), effectuez votre réservation en ligne. Le règlement des frais s'effectuera directement lors de votre enregistrement physique à Cotonou.
@@ -88,21 +197,20 @@ const styles = {
   page: {
     padding: '4rem 0',
     minHeight: '80vh',
-    display: 'flex',
-    flexDirection: 'column' as const,
+    background: '#FFFFFF',
   },
   container: {
-    maxWidth: '1200px',
+    maxWidth: '1400px',
     margin: '0 auto',
-    padding: '0 2rem',
+    padding: '0 1.5rem',
     width: '100%',
   },
   header: {
     marginBottom: '3rem',
   },
   badge: {
-    background: 'rgba(232, 131, 42, 0.15)',
-    border: '1px solid rgba(232, 131, 42, 0.3)',
+    background: 'rgba(232, 131, 42, 0.08)',
+    border: '1px solid rgba(232, 131, 42, 0.2)',
     color: 'var(--accent)',
     marginBottom: '1rem',
   },
@@ -110,23 +218,14 @@ const styles = {
     fontFamily: 'var(--font-title)',
     fontSize: '2.5rem',
     fontWeight: '800',
-    color: '#FFFFFF',
+    color: 'var(--text-dark)',
     marginBottom: '0.75rem',
   },
   subtitle: {
     fontSize: '1.1rem',
-    color: '#94A3B8',
+    color: 'var(--text-muted)',
     maxWidth: '800px',
     lineHeight: '1.6',
-  },
-  detailsGrid: {
-    display: 'grid',
-    gridTemplateColumns: '3fr 1.5fr',
-    gap: '2.5rem',
-    alignItems: 'start',
-    '@media (max-width: 900px)': {
-      gridTemplateColumns: '1fr',
-    },
   },
   mainContent: {
     padding: '3rem',
@@ -135,7 +234,7 @@ const styles = {
     fontFamily: 'var(--font-title)',
     fontSize: '1.75rem',
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: 'var(--text-dark)',
     marginBottom: '1.5rem',
   },
   sectionBlock: {
@@ -145,29 +244,97 @@ const styles = {
     fontFamily: 'var(--font-title)',
     fontSize: '1.3rem',
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: 'var(--text-dark)',
     marginBottom: '1rem',
   },
   text: {
     fontSize: '0.95rem',
     lineHeight: '1.7',
-    color: '#94A3B8',
+    color: 'var(--text-muted)',
     marginBottom: '1.25rem',
   },
   themeQuote: {
     borderLeft: '4px solid var(--primary)',
-    background: 'rgba(56, 165, 84, 0.05)',
+    background: 'rgba(56, 165, 84, 0.04)',
     padding: '1.25rem 1.5rem',
     fontSize: '1rem',
     lineHeight: '1.6',
-    color: '#E2E8F0',
+    color: 'var(--text-dark)',
     margin: '1.25rem 0',
   },
   sectionDivider: {
     width: '100%',
     height: '1px',
-    background: 'rgba(255, 255, 255, 0.08)',
+    background: '#E2E8F0',
     margin: '2rem 0',
+  },
+  panelCard: {
+    background: '#F8FAFC',
+    border: '1px solid #E2E8F0',
+    borderRadius: '8px',
+    padding: '1.25rem',
+  },
+  panelTitle: {
+    fontFamily: 'var(--font-title)',
+    fontSize: '1rem',
+    fontWeight: '700',
+    color: 'var(--primary)',
+    marginBottom: '0.25rem',
+  },
+  panelDesc: {
+    fontSize: '0.85rem',
+    color: 'var(--text-dark)',
+  },
+  timeline: {
+    display: 'flex',
+    flexDirection: 'column' as const,
+    gap: '0',
+    marginBottom: '3rem',
+    marginLeft: '0.5rem',
+    borderLeft: '2px solid rgba(56, 165, 84, 0.2)',
+    position: 'relative' as const,
+  },
+  timelineItem: {
+    display: 'flex',
+    flexDirection: 'column' as const,
+    paddingLeft: '1.5rem',
+    paddingBottom: '1.5rem',
+    position: 'relative' as const,
+  },
+  timelineDot: {
+    position: 'absolute' as const,
+    left: '-6px',
+    top: '0',
+    width: '10px',
+    height: '10px',
+    borderRadius: '50%',
+    background: 'var(--primary)',
+    boxShadow: '0 0 0 4px rgba(56, 165, 84, 0.1)',
+  },
+  timelineTime: {
+    fontWeight: '800',
+    color: 'var(--accent)',
+    fontSize: '0.9rem',
+    marginBottom: '0.25rem',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.5rem',
+  },
+  timelineContent: {
+    fontSize: '0.95rem',
+    color: 'var(--text-dark)',
+    background: '#F8FAFC',
+    padding: '1rem',
+    borderRadius: '6px',
+    border: '1px solid #E2E8F0',
+    marginTop: '0.25rem',
+  },
+  timelineSubList: {
+    marginTop: '0.5rem',
+    paddingLeft: '1rem',
+    fontSize: '0.85rem',
+    color: 'var(--text-muted)',
+    listStyleType: 'disc',
   },
   sidebar: {
     display: 'flex',
@@ -181,7 +348,7 @@ const styles = {
     fontFamily: 'var(--font-title)',
     fontSize: '1.1rem',
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: 'var(--text-dark)',
     marginBottom: '1.25rem',
     textTransform: 'uppercase' as const,
     letterSpacing: '0.05em',
@@ -191,13 +358,8 @@ const styles = {
     flexDirection: 'column' as const,
     gap: '0.25rem',
     paddingBottom: '1rem',
-    borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+    borderBottom: '1px solid #F1F5F9',
     marginBottom: '1rem',
-    ':last-child': {
-      borderBottom: 'none',
-      marginBottom: 0,
-      paddingBottom: 0,
-    },
   },
   infoLabel: {
     fontSize: '0.7rem',
@@ -208,12 +370,12 @@ const styles = {
   infoVal: {
     fontSize: '0.95rem',
     fontWeight: '600',
-    color: '#FFFFFF',
+    color: 'var(--text-dark)',
   },
   sidebarText: {
     fontSize: '0.85rem',
     lineHeight: '1.5',
-    color: '#94A3B8',
+    color: 'var(--text-muted)',
     marginBottom: '1.5rem',
   },
   ctaBtn: {

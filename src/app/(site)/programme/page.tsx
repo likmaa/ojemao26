@@ -6,7 +6,7 @@ import Link from 'next/link';
 interface ProgramItem {
   time: string;
   title: string;
-  type: string; // 'Cérémonie' | 'Conférence' | 'Panel' | 'Atelier' | 'Statutaire' | 'Pause'
+  type: string;
   description?: string;
   volet: 'Débat' | 'CIF' | 'Congrès' | 'Tous';
 }
@@ -16,53 +16,66 @@ export default function ProgrammePage() {
 
   const schedule: Record<'25' | '26' | '27' | '28', ProgramItem[]> = {
     '25': [
-      { time: '08:00 - 08:30', title: 'Accueil et Enregistrement des participants', type: 'Accueil', volet: 'Débat' },
-      { time: '08:30 - 09:30', title: "Cérémonie d'Ouverture Officielle du Débat de Cotonou", type: 'Cérémonie', description: 'Allocutions des autorités locales, des partenaires et des comités d\'organisation.', volet: 'Débat' },
-      { time: '09:30 - 10:30', title: 'Conférence Cadrage : Responsabilités des intellectuels musulmans face aux défis sécuritaires contemporains', type: 'Conférence', volet: 'Débat' },
-      { time: '10:30 - 11:00', title: 'Pause Café / Réseautage', type: 'Pause', volet: 'Tous' },
-      { time: '11:00 - 13:00', title: 'Panel 1 : Analyse des causes et dynamiques de l\'extrémisme violent en Afrique de l\'Ouest', type: 'Panel', description: 'Présentations croisées d\'universitaires et de chercheurs en géopolitique.', volet: 'Débat' },
-      { time: '13:00 - 14:30', title: 'Pause Déjeuner & Prière', type: 'Pause', volet: 'Tous' },
-      { time: '14:30 - 16:30', title: 'Panel 2 : Rôle et contribution opérationnelle des ONG et associations islamiques dans la prévention', type: 'Panel', description: 'Partage de bonnes pratiques et présentation d\'études de cas locales.', volet: 'Débat' },
-      { time: '16:30 - 17:30', title: 'Panel 3 & Lecture des Recommandations du Débat (D2C26)', type: 'Panel', description: 'Synthèse des travaux et adoption de la feuille de route du pôle de réflexion.', volet: 'Débat' },
+      { time: '07:30 - 08:30', title: 'Accueil et enregistrement des participants', type: 'Accueil', volet: 'Débat' },
+      { time: '08:30 - 08:45', title: 'Ouverture officielle', type: 'Cérémonie', description: 'Lecture de versets, hymne national, mot de bienvenue.', volet: 'Débat' },
+      { time: '08:45 - 09:30', title: 'Allocutions officielles', type: 'Cérémonie', description: 'Interventions de la CEDEAO, UEMOA, UNDP, OCI, DICID, Ministres.', volet: 'Débat' },
+      { time: '09:30 - 10:15', title: 'Présentation : Unité et engagement pour la paix et la stabilité', type: 'Conférence', description: 'Par SAR Lamido Sanusi Lamido.', volet: 'Débat' },
+      { time: '10:15 - 10:45', title: 'Pause Café / Contexte et Justification', type: 'Pause', volet: 'Tous' },
+      { time: '10:45 - 11:15', title: 'PANEL 1 : Terrorisme, radicalisation et extrémisme violent en Afrique de l\'Ouest', type: 'Panel', volet: 'Débat' },
+      { time: '11:15 - 11:30', title: 'Pause Café', type: 'Pause', volet: 'Tous' },
+      { time: '11:30 - 12:45', title: 'PANEL 2 : Rôle des intellectuels musulmans dans la construction de la paix', type: 'Panel', volet: 'Débat' },
+      { time: '12:45 - 14:00', title: 'Pause déjeuner et prière', type: 'Pause', volet: 'Tous' },
+      { time: '14:00 - 15:15', title: 'PANEL 3 : Associations et ONG islamiques face au terrorisme', type: 'Panel', volet: 'Débat' },
+      { time: '15:15 - 15:30', title: 'Pause Café', type: 'Pause', volet: 'Tous' },
+      { time: '15:30 - 16:30', title: 'Table ronde de synthèse : Stratégies concertées', type: 'Panel', volet: 'Débat' },
+      { time: '16:30 - 17:00', title: 'Adoption des recommandations', type: 'Statutaire', volet: 'Débat' },
+      { time: '17:00 - 17:30', title: 'Lecture du communiqué final & Cérémonie de clôture', type: 'Cérémonie', volet: 'Débat' },
     ],
     '26': [
-      { time: '08:00 - 09:00', title: 'Accueil et Enregistrement des Délégués et Participants CIF', type: 'Accueil', volet: 'Tous' },
-      { time: '09:00 - 11:00', title: "Cérémonie d'Ouverture Conjointe du Congrès OJEMAO & du Colloque (CIF)", type: 'Cérémonie', description: 'Allocutions protocolaires en présence de délégations ministérielles de la sous-région.', volet: 'Tous' },
-      { time: '11:00 - 11:30', title: 'Pause Café / Photo de famille officielle', type: 'Pause', volet: 'Tous' },
-      { time: '11:30 - 13:00', title: 'Conférence Inaugurale : La communauté médiane (Oumma Wasatiyya) - Fondements coraniques et réalités ouest-africaines', type: 'Conférence', volet: 'CIF' },
-      { time: '13:00 - 14:30', title: 'Pause Déjeuner & Prière', type: 'Pause', volet: 'Tous' },
-      { time: '14:30 - 16:30', title: 'Session Statutaire Congrès : Présentation et adoption du rapport moral et d\'activités du Bureau Sortant', type: 'Statutaire', volet: 'Congrès' },
-      { time: '14:30 - 17:00', title: 'Colloque (CIF) - Panel 1 : Les enjeux de la radicalisation chez les jeunes et l\'alternative éducative islamique', type: 'Panel', volet: 'CIF' },
+      { time: '08:00 - 09:00', title: 'Accueil et installation des participants', type: 'Accueil', volet: 'Tous' },
+      { time: '09:00 - 10:15', title: "Cérémonie officielle d'ouverture", type: 'Cérémonie', description: 'Allocutions protocolaires et lancement officiel du Congrès.', volet: 'Tous' },
+      { time: '10:15 - 10:30', title: 'Pause-café', type: 'Pause', volet: 'Tous' },
+      { time: '10:30 - 11:30', title: 'Conférence inaugurale : La communauté médiane dans le Coran et la Sunnah', type: 'Conférence', volet: 'CIF' },
+      { time: '11:30 - 13:00', title: 'PANEL 1 : Conversations avec la Jeunesse Ouest-Africaine', type: 'Panel', volet: 'CIF' },
+      { time: '13:00 - 14:30', title: 'Pause Déjeuner / Prière', type: 'Pause', volet: 'Tous' },
+      { time: '14:30 - 16:00', title: 'PANEL 2 : Fondements théologiques et conceptuels de la Oumma Wasatiyya', type: 'Panel', volet: 'CIF' },
+      { time: '16:00 - 17:30', title: 'PANEL 3 : Jeunesse musulmane & équilibre identitaire', type: 'Panel', volet: 'CIF' },
+      { time: '17:30 - 18:00', title: 'Synthèse de la journée', type: 'Atelier', volet: 'Tous' },
+      { time: '20:00 - 23:00', title: 'Dîner de bienvenue & Soirée Culturelle / Bilan BNC', type: 'Cérémonie', volet: 'Tous' },
     ],
     '27': [
-      { time: '08:30 - 10:30', title: 'Colloque (CIF) - Panel 2 : Pratiques de la jeunesse musulmane, engagement citoyen et réseaux sociaux', type: 'Panel', volet: 'CIF' },
-      { time: '08:30 - 11:00', title: 'Congrès OJEMAO : Travaux en commissions thématiques (Réforme des textes, Plan stratégique)', type: 'Statutaire', volet: 'Congrès' },
-      { time: '10:30 - 11:00', title: 'Pause Café', type: 'Pause', volet: 'Tous' },
-      { time: '11:00 - 13:00', title: 'Colloque (CIF) - Ateliers pratiques : Leadership, Gestion de projet et Communication associative', type: 'Atelier', description: 'Sessions parallèles interactives en petits groupes.', volet: 'CIF' },
-      { time: '13:00 - 14:30', title: 'Pause Déjeuner & Prière', type: 'Pause', volet: 'Tous' },
-      { time: '14:30 - 17:30', title: 'Congrès OJEMAO : Restitution des commissions et débats en plénière', type: 'Statutaire', volet: 'Congrès' },
-      { time: '14:30 - 17:00', title: 'Colloque (CIF) - Conférence : L\'entreprenariat des jeunes comme rempart contre l\'oisiveté et l\'extrémisme', type: 'Conférence', volet: 'CIF' },
+      { time: '08:30 - 10:00', title: 'PANEL 4 : Médianité et prévention des extrémismes', type: 'Panel', volet: 'CIF' },
+      { time: '10:00 - 11:30', title: 'PANEL 5 : Islam, citoyenneté et cohésion sociale en Afrique de l\'Ouest', type: 'Panel', volet: 'CIF' },
+      { time: '11:30 - 11:45', title: 'Pause-café', type: 'Pause', volet: 'Tous' },
+      { time: '11:45 - 13:00', title: 'PANEL 6 : Défis socio-économiques et autonomisation des jeunes', type: 'Panel', volet: 'CIF' },
+      { time: '13:00 - 14:30', title: 'Pause-déjeuner', type: 'Pause', volet: 'Tous' },
+      { time: '14:30 - 16:30', title: 'Ateliers de Formation : Première série (Leadership, Prévention, Communication)', type: 'Atelier', volet: 'CIF' },
+      { time: '16:30 - 18:30', title: 'Ateliers de Formation : Deuxième série (Gestion des conflits, Entrepreneuriat)', type: 'Atelier', volet: 'CIF' },
+      { time: '20:30 - 23:00', title: 'Élection OJEMAO (Congressistes) & Soirée culturelle (CIF)', type: 'Statutaire', volet: 'Tous' },
     ],
     '28': [
-      { time: '08:30 - 10:30', title: 'Colloque (CIF) - Session de synthèse et recommandations finales des jeunes', type: 'Panel', volet: 'CIF' },
-      { time: '08:30 - 11:00', title: 'Congrès OJEMAO - Plénière élective : Élection du nouveau bureau exécutif et passation de charge', type: 'Statutaire', volet: 'Congrès' },
-      { time: '10:30 - 11:00', title: 'Pause Café', type: 'Pause', volet: 'Tous' },
-      { time: '11:00 - 13:00', title: 'Cérémonie de Clôture Officielle, Lecture de la Déclaration finale de Cotonou', type: 'Cérémonie', description: 'Remise des attestations aux participants du CIF et clôture solennelle du Congrès.', volet: 'Tous' },
-      { time: '13:00', title: 'Déjeuner de clôture & Départ des délégations', type: 'Pause', volet: 'Tous' },
+      { time: '08:30 - 10:00', title: 'PANEL 7 : Gouvernance et renforcement des organisations de jeunesse', type: 'Panel', volet: 'CIF' },
+      { time: '10:00 - 10:30', title: 'Pause-café', type: 'Pause', volet: 'Tous' },
+      { time: '10:30 - 12:00', title: 'SESSION STRATÉGIQUE : Élaboration du Plan d\'action régional 2026-2028', type: 'Statutaire', volet: 'Congrès' },
+      { time: '12:00 - 13:00', title: 'Lecture des recommandations & adoption du Plan d\'action', type: 'Statutaire', volet: 'Congrès' },
+      { time: '13:00 - 14:30', title: 'Pause-déjeuner', type: 'Pause', volet: 'Tous' },
+      { time: '14:30 - 15:30', title: 'Mise en place du Cadre de coopération ouest-africain', type: 'Statutaire', volet: 'Congrès' },
+      { time: '15:30 - 16:30', title: 'Cérémonie de clôture Officielle', type: 'Cérémonie', volet: 'Tous' },
+      { time: '16:30 - 19:00', title: 'Tourisme et Visites de la ville (Facultatif)', type: 'Atelier', volet: 'Tous' },
     ],
   };
 
   const getVoletBadgeStyle = (volet: string) => {
     switch (volet) {
-      case 'Débat': return { background: 'rgba(56, 165, 84, 0.15)', border: '1px solid rgba(56, 165, 84, 0.3)', color: '#4ADE80' };
-      case 'CIF': return { background: 'rgba(232, 131, 42, 0.15)', border: '1px solid rgba(232, 131, 42, 0.3)', color: '#FDBA74' };
-      case 'Congrès': return { background: 'rgba(3, 67, 137, 0.3)', border: '1px solid rgba(3, 67, 137, 0.5)', color: '#60A5FA' };
-      default: return { background: 'rgba(255, 255, 255, 0.08)', border: '1px solid rgba(255, 255, 255, 0.15)', color: '#E2E8F0' };
+      case 'Débat': return { background: 'rgba(56, 165, 84, 0.08)', border: '1px solid rgba(56, 165, 84, 0.2)', color: 'var(--primary)' };
+      case 'CIF': return { background: 'rgba(232, 131, 42, 0.08)', border: '1px solid rgba(232, 131, 42, 0.2)', color: 'var(--accent)' };
+      case 'Congrès': return { background: 'rgba(3, 67, 137, 0.08)', border: '1px solid rgba(3, 67, 137, 0.2)', color: 'var(--secondary)' };
+      default: return { background: '#F8FAFC', border: '1px solid #E2E8F0', color: 'var(--text-muted)' };
     }
   };
 
   return (
-    <div style={styles.page} className="grid-bg theme-dark animate-fade-in">
+    <div style={styles.page} className="animate-fade-in">
       <div style={styles.container}>
         <header style={styles.header}>
           <span style={styles.badge} className="badge-solid">Agenda officiel</span>
@@ -78,8 +91,9 @@ export default function ProgrammePage() {
             onClick={() => setActiveTab('25')}
             style={{
               ...styles.tabBtn,
-              backgroundColor: activeTab === '25' ? 'var(--primary)' : 'rgba(255, 255, 255, 0.03)',
-              borderColor: activeTab === '25' ? 'var(--primary)' : 'rgba(255, 255, 255, 0.1)',
+              backgroundColor: activeTab === '25' ? 'var(--primary)' : '#F8FAFC',
+              borderColor: activeTab === '25' ? 'var(--primary)' : '#E2E8F0',
+              color: activeTab === '25' ? '#FFFFFF' : 'var(--text-dark)',
             }}
           >
             <span style={styles.tabDate}>Sam. 25 Juillet</span>
@@ -90,8 +104,9 @@ export default function ProgrammePage() {
             onClick={() => setActiveTab('26')}
             style={{
               ...styles.tabBtn,
-              backgroundColor: activeTab === '26' ? 'var(--secondary)' : 'rgba(255, 255, 255, 0.03)',
-              borderColor: activeTab === '26' ? 'var(--secondary)' : 'rgba(255, 255, 255, 0.1)',
+              backgroundColor: activeTab === '26' ? 'var(--secondary)' : '#F8FAFC',
+              borderColor: activeTab === '26' ? 'var(--secondary)' : '#E2E8F0',
+              color: activeTab === '26' ? '#FFFFFF' : 'var(--text-dark)',
             }}
           >
             <span style={styles.tabDate}>Dim. 26 Juillet</span>
@@ -102,8 +117,9 @@ export default function ProgrammePage() {
             onClick={() => setActiveTab('27')}
             style={{
               ...styles.tabBtn,
-              backgroundColor: activeTab === '27' ? 'var(--secondary)' : 'rgba(255, 255, 255, 0.03)',
-              borderColor: activeTab === '27' ? 'var(--secondary)' : 'rgba(255, 255, 255, 0.1)',
+              backgroundColor: activeTab === '27' ? 'var(--secondary)' : '#F8FAFC',
+              borderColor: activeTab === '27' ? 'var(--secondary)' : '#E2E8F0',
+              color: activeTab === '27' ? '#FFFFFF' : 'var(--text-dark)',
             }}
           >
             <span style={styles.tabDate}>Lun. 27 Juillet</span>
@@ -114,8 +130,9 @@ export default function ProgrammePage() {
             onClick={() => setActiveTab('28')}
             style={{
               ...styles.tabBtn,
-              backgroundColor: activeTab === '28' ? 'var(--secondary)' : 'rgba(255, 255, 255, 0.03)',
-              borderColor: activeTab === '28' ? 'var(--secondary)' : 'rgba(255, 255, 255, 0.1)',
+              backgroundColor: activeTab === '28' ? 'var(--secondary)' : '#F8FAFC',
+              borderColor: activeTab === '28' ? 'var(--secondary)' : '#E2E8F0',
+              color: activeTab === '28' ? '#FFFFFF' : 'var(--text-dark)',
             }}
           >
             <span style={styles.tabDate}>Mar. 28 Juillet</span>
@@ -126,9 +143,9 @@ export default function ProgrammePage() {
         {/* Schedule List */}
         <section style={styles.scheduleList} className="glass">
           {schedule[activeTab].map((item, idx) => (
-            <div key={idx} style={styles.scheduleItem}>
+            <div key={idx} className="schedule-item" style={styles.scheduleItem}>
               {/* Time column */}
-              <div style={styles.timeCol}>
+              <div className="time-col" style={styles.timeCol}>
                 <span style={styles.timeText}>{item.time}</span>
               </div>
               
@@ -165,11 +182,12 @@ const styles = {
   page: {
     padding: '4rem 0',
     minHeight: '80vh',
+    background: '#FFFFFF',
   },
   container: {
-    maxWidth: '900px',
+    maxWidth: '1400px',
     margin: '0 auto',
-    padding: '0 2rem',
+    padding: '0 1.5rem',
     width: '100%',
   },
   header: {
@@ -177,8 +195,8 @@ const styles = {
     textAlign: 'center' as const,
   },
   badge: {
-    background: 'rgba(3, 67, 137, 0.15)',
-    border: '1px solid rgba(3, 67, 137, 0.3)',
+    background: 'rgba(3, 67, 137, 0.08)',
+    border: '1px solid rgba(3, 67, 137, 0.2)',
     color: 'var(--secondary)',
     marginBottom: '1rem',
   },
@@ -186,12 +204,12 @@ const styles = {
     fontFamily: 'var(--font-title)',
     fontSize: '2.5rem',
     fontWeight: '800',
-    color: '#FFFFFF',
+    color: 'var(--text-dark)',
     marginBottom: '0.75rem',
   },
   subtitle: {
     fontSize: '1rem',
-    color: '#94A3B8',
+    color: 'var(--text-muted)',
     lineHeight: '1.6',
   },
   tabsContainer: {
@@ -206,10 +224,9 @@ const styles = {
     alignItems: 'center',
     padding: '1.25rem 1rem',
     border: '1px solid',
-    color: '#FFFFFF',
     cursor: 'pointer',
     textAlign: 'center' as const,
-    borderRadius: '0px', // Strict flat
+    borderRadius: '0px',
     transition: 'all 0.15s ease',
     outline: 'none',
   },
@@ -232,22 +249,14 @@ const styles = {
   scheduleItem: {
     display: 'grid',
     gridTemplateColumns: '180px 1fr',
-    borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+    borderBottom: '1px solid #F1F5F9',
     padding: '2rem',
     alignItems: 'start',
-    ':last-child': {
-      borderBottom: 'none',
-    },
-    '@media (max-width: 700px)': {
-      gridTemplateColumns: '1fr',
-      gap: '1rem',
-      padding: '1.5rem',
-    },
   },
   timeCol: {
     fontFamily: 'var(--font-title)',
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: 'var(--text-dark)',
     fontSize: '1.05rem',
   },
   timeText: {
@@ -282,12 +291,12 @@ const styles = {
     fontFamily: 'var(--font-title)',
     fontSize: '1.15rem',
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: 'var(--text-dark)',
     lineHeight: '1.4',
   },
   itemDescription: {
     fontSize: '0.85rem',
-    color: '#94A3B8',
+    color: 'var(--text-muted)',
     lineHeight: '1.5',
     marginTop: '0.25rem',
   },
@@ -295,11 +304,11 @@ const styles = {
     textAlign: 'center' as const,
     marginTop: '3rem',
     padding: '2rem',
-    border: '1px dashed rgba(255, 255, 255, 0.1)',
+    border: '1px dashed #CBD5E1',
   },
   ctaText: {
     fontSize: '0.9rem',
-    color: '#94A3B8',
+    color: 'var(--text-muted)',
     marginBottom: '1.25rem',
   },
   ctaBtn: {},

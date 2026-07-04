@@ -3,7 +3,7 @@ import React from 'react';
 interface FormFieldProps {
   label: string;
   name: string;
-  type?: 'text' | 'email' | 'tel' | 'number' | 'date' | 'textarea' | 'select' | 'radio';
+  type?: 'text' | 'email' | 'tel' | 'number' | 'date' | 'textarea' | 'select' | 'radio' | 'password';
   required?: boolean;
   placeholder?: string;
   options?: { value: string; label: string }[];
@@ -20,14 +20,14 @@ export default function FormField({
   options = [],
   defaultValue,
   infoText,
-}: FormFieldProps) {
+} : FormFieldProps) {
   const commonInputStyles = {
     width: '100%',
     padding: '0.75rem 1rem',
-    borderRadius: '8px',
-    border: '1px solid rgba(255, 255, 255, 0.1)',
-    background: 'rgba(255, 255, 255, 0.03)',
-    color: '#FFFFFF',
+    borderRadius: '0px',
+    border: '1px solid #E2E8F0',
+    background: '#FFFFFF',
+    color: 'var(--text-dark)',
     fontSize: '0.95rem',
     fontFamily: 'var(--font-inter)',
     transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
@@ -59,11 +59,11 @@ export default function FormField({
             style={{ ...commonInputStyles, appearance: 'none', WebkitAppearance: 'none' } as React.CSSProperties}
             className="form-input-focus"
           >
-            <option value="" disabled style={{ background: '#0A1628', color: '#64748B' }}>
+            <option value="" disabled style={{ background: '#FFFFFF', color: '#94A3B8' }}>
               {placeholder || 'Sélectionnez une option'}
             </option>
             {options.map((opt) => (
-              <option key={opt.value} value={opt.value} style={{ background: '#0A1628', color: '#FFFFFF' }}>
+              <option key={opt.value} value={opt.value} style={{ background: '#FFFFFF', color: 'var(--text-dark)' }}>
                 {opt.label}
               </option>
             ))}
@@ -123,10 +123,10 @@ const styles = {
     marginBottom: '1.25rem',
   },
   label: {
-    fontFamily: 'var(--font-outfit)',
+    fontFamily: 'var(--font-title)',
     fontSize: '0.9rem',
     fontWeight: '600',
-    color: '#E2E8F0',
+    color: 'var(--text-dark)',
     textAlign: 'left' as const,
   },
   required: {
@@ -135,7 +135,7 @@ const styles = {
   },
   info: {
     fontSize: '0.75rem',
-    color: '#94A3B8',
+    color: 'var(--text-muted)',
     marginTop: '0.25rem',
     textAlign: 'left' as const,
   },
@@ -153,12 +153,12 @@ const styles = {
   },
   radioInput: {
     cursor: 'pointer',
-    accentColor: 'var(--accent)',
+    accentColor: 'var(--primary)',
     width: '18px',
     height: '18px',
   },
   radioText: {
     fontSize: '0.9rem',
-    color: '#E2E8F0',
+    color: 'var(--text-dark)',
   },
 };

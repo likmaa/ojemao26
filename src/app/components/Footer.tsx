@@ -1,4 +1,6 @@
 import Link from 'next/link';
+import Image from 'next/image';
+import { FaPhoneAlt, FaWhatsapp, FaMapMarkerAlt } from 'react-icons/fa';
 
 export default function Footer() {
   return (
@@ -7,9 +9,13 @@ export default function Footer() {
         <div style={styles.grid}>
           {/* Col 1: About / Branding */}
           <div style={styles.col}>
-            <div style={styles.logoBadge}>
-              <span style={styles.logoText}>OJEMAO 2026</span>
-            </div>
+            <Image
+              src="/images/logo.png"
+              alt="OJEMAO 2026 Logo"
+              width={160}
+              height={55}
+              style={{ objectFit: 'contain', marginBottom: '0.5rem' }}
+            />
             <p style={styles.aboutText}>
               Événements institutionnels portés par l'Association des Intellectuels Musulmans du Bénin (AIMB), l'ACEEMUB, l'OJEMAO et le RAI-Bénin à Cotonou.
             </p>
@@ -40,12 +46,35 @@ export default function Footer() {
           {/* Col 4: Partners / Logos */}
           <div style={styles.col}>
             <h4 style={styles.colTitle}>Organisateurs</h4>
-            <p style={styles.organizerText}>
-              AIMB • ACEEMUB • OJEMAO • RAI-BÉNIN
+            
+            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '0.5rem', alignItems: 'center' }}>
+              {[
+                "logo_ojemao.png",
+                "logo_aimb.png",
+                "logo_aceemub.png",
+                "logo_raibenin.png"
+              ].map((name, i) => (
+                <div key={i}>
+                  <img src={`/images/organisateurs/${name}`} alt={`Organisateur ${i + 1}`} style={{ height: '40px', width: 'auto', objectFit: 'contain' }} />
+                </div>
+              ))}
+            </div>
+
+            <p style={{...styles.organizerText, fontSize: '0.75rem'}}>
+              OJEMAO • AIMB • ACEEMUB • RAI-BÉNIN
             </p>
+            
             <div style={styles.contactInfo}>
-              <p style={styles.contactItem}>📧 info@ojemao26.logtech.tech</p>
-              <p style={styles.contactItem}>📍 Cotonou, Bénin</p>
+              <p style={{ ...styles.contactItem, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <FaPhoneAlt size={12} color="var(--primary)" /> 
+                <a href="tel:+2290169506246" style={{ color: 'inherit', textDecoration: 'none' }}>+229 0169506246</a>
+              </p>
+              <Link href="https://wa.me/2290169506246" target="_blank" rel="noopener noreferrer" style={styles.whatsappLink}>
+                <FaWhatsapp size={16} /> Discuter sur WhatsApp
+              </Link>
+              <p style={{ ...styles.contactItem, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <FaMapMarkerAlt size={12} color="var(--accent)" /> Cotonou, Bénin
+              </p>
             </div>
           </div>
         </div>
@@ -65,9 +94,9 @@ export default function Footer() {
 
 const styles = {
   footer: {
-    backgroundColor: 'var(--background-dark)',
-    borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-    color: '#94A3B8',
+    backgroundColor: '#FFFFFF',
+    borderTop: '1px solid #E2E8F0',
+    color: 'var(--text-muted)',
     padding: '4rem 0 2rem 0',
     width: '100%',
     marginTop: 'auto',
@@ -89,8 +118,7 @@ const styles = {
     gap: '1rem',
   },
   logoBadge: {
-    background: 'rgba(255, 255, 255, 0.05)',
-    border: '1px solid rgba(255, 255, 255, 0.1)',
+    background: 'var(--primary)',
     padding: '0.4rem 1.1rem',
     width: 'fit-content',
   },
@@ -104,10 +132,11 @@ const styles = {
   aboutText: {
     fontSize: '0.85rem',
     lineHeight: '1.6',
+    color: 'var(--text-muted)',
   },
   colTitle: {
     fontFamily: 'var(--font-title)',
-    color: '#FFFFFF',
+    color: 'var(--text-dark)',
     fontSize: '0.9rem',
     fontWeight: '700',
     textTransform: 'uppercase' as const,
@@ -121,19 +150,16 @@ const styles = {
   },
   link: {
     fontSize: '0.85rem',
-    color: '#94A3B8',
+    color: 'var(--text-muted)',
     transition: 'color 0.15s ease',
     width: 'fit-content',
     borderBottom: '1px solid transparent',
     paddingBottom: '2px',
-    ':hover': {
-      color: '#FFFFFF',
-    },
   },
   organizerText: {
     fontSize: '0.85rem',
     fontWeight: '600',
-    color: '#FFFFFF',
+    color: 'var(--text-dark)',
   },
   contactInfo: {
     display: 'flex',
@@ -143,10 +169,22 @@ const styles = {
     marginTop: '0.5rem',
   },
   contactItem: {
-    color: '#94A3B8',
+    color: 'var(--text-muted)',
+    fontWeight: '600',
+  },
+  whatsappLink: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '0.3rem',
+    color: '#25D366', // WhatsApp Brand Color
+    fontWeight: '600',
+    fontSize: '0.8rem',
+    textDecoration: 'none',
+    marginTop: '0.25rem',
+    marginBottom: '0.25rem',
   },
   bottomBar: {
-    borderTop: '1px solid rgba(255, 255, 255, 0.05)',
+    borderTop: '1px solid #E2E8F0',
     paddingTop: '2rem',
     display: 'flex',
     justifyContent: 'space-between',
@@ -156,6 +194,7 @@ const styles = {
   },
   copyright: {
     fontSize: '0.75rem',
+    color: 'var(--text-muted)',
   },
   bottomLinks: {
     display: 'flex',
@@ -163,6 +202,6 @@ const styles = {
   },
   bottomLink: {
     fontSize: '0.75rem',
-    color: '#64748B',
+    color: 'var(--text-muted)',
   },
 };

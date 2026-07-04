@@ -2,10 +2,8 @@ import Link from 'next/link';
 
 export default function InscriptionHub() {
   return (
-    <main style={styles.page} className="grid-bg theme-dark animate-fade-in">
-      <div style={styles.overlay}></div>
-
-      <div style={styles.container} className="animate-slide-up">
+    <main style={styles.page} className="animate-fade-in">
+      <div style={styles.container}>
         {/* Navigation back link */}
         <div style={styles.navContainer}>
           <Link href="/" style={styles.backLink}>
@@ -22,7 +20,7 @@ export default function InscriptionHub() {
 
         <div style={styles.grid}>
           {/* Card 1: Débat de Cotonou */}
-          <div style={styles.card} className="glass">
+          <div style={styles.card}>
             <div>
               <span style={styles.cardBadgeGratuit}>Public & Gratuit</span>
               <h2 style={styles.cardTitle}>Débat de Cotonou (D2C26)</h2>
@@ -37,7 +35,7 @@ export default function InscriptionHub() {
           </div>
 
           {/* Card 2: CIF */}
-          <div style={styles.card} className="glass">
+          <div style={styles.card}>
             <div>
               <span style={styles.cardBadgeCif}>Réservation en ligne</span>
               <h2 style={styles.cardTitle}>Colloque International (CIF)</h2>
@@ -67,32 +65,20 @@ export default function InscriptionHub() {
 
 const styles = {
   page: {
-    position: 'relative' as const,
-    minHeight: '100vh',
+    minHeight: '80vh',
     display: 'flex',
     flexDirection: 'column' as const,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: '4rem 1.5rem',
-    overflowX: 'hidden' as const,
-  },
-  overlay: {
-    position: 'absolute' as const,
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    background: 'radial-gradient(circle at center, transparent 30%, rgba(7, 15, 27, 0.8) 100%)',
-    pointerEvents: 'none' as const,
-    zIndex: 1,
+    padding: '2rem 1rem',
+    background: '#FFFFFF',
   },
   container: {
-    position: 'relative' as const,
-    zIndex: 2,
-    maxWidth: '900px',
+    maxWidth: '1400px',
     width: '100%',
     display: 'flex',
     flexDirection: 'column' as const,
+    padding: '0 0.5rem',
   },
   navContainer: {
     width: '100%',
@@ -101,7 +87,7 @@ const styles = {
     marginBottom: '2rem',
   },
   backLink: {
-    color: '#94A3B8',
+    color: 'var(--text-muted)',
     fontSize: '0.95rem',
     fontWeight: '500',
     display: 'inline-flex',
@@ -112,42 +98,44 @@ const styles = {
     marginBottom: '3rem',
   },
   title: {
-    fontFamily: 'var(--font-outfit)',
+    fontFamily: 'var(--font-title)',
     fontSize: '2.5rem',
     fontWeight: '800',
-    color: '#FFF',
+    color: 'var(--text-dark)',
     marginBottom: '0.75rem',
   },
   subtitle: {
     fontSize: '1.05rem',
-    color: '#94A3B8',
+    color: 'var(--text-muted)',
     maxWidth: '600px',
     margin: '0 auto',
     lineHeight: '1.5',
   },
   grid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))',
     gap: '2rem',
     marginBottom: '3rem',
   },
   card: {
-    padding: '2.5rem 2rem',
-    borderRadius: '0px',
+    padding: '2rem 1.5rem',
     display: 'flex',
     flexDirection: 'column' as const,
     justifyContent: 'space-between',
     minHeight: '420px',
+    backgroundColor: '#FFFFFF',
+    borderRadius: '16px',
+    boxShadow: '0 10px 40px -10px rgba(0,0,0,0.08)',
+    border: '1px solid rgba(226, 232, 240, 0.6)',
   },
   cardBadgeGratuit: {
     display: 'inline-block',
     fontSize: '0.75rem',
     fontWeight: '700',
-    background: 'rgba(45, 168, 90, 0.15)',
-    border: '1px solid rgba(45, 168, 90, 0.3)',
-    color: '#4ADE80',
+    background: 'rgba(56, 165, 84, 0.08)',
+    border: '1px solid rgba(56, 165, 84, 0.2)',
+    color: 'var(--primary)',
     padding: '0.3rem 0.75rem',
-    borderRadius: '0px',
     textTransform: 'uppercase' as const,
     letterSpacing: '0.05em',
     marginBottom: '1rem',
@@ -156,43 +144,40 @@ const styles = {
     display: 'inline-block',
     fontSize: '0.75rem',
     fontWeight: '700',
-    background: 'rgba(232, 131, 42, 0.15)',
-    border: '1px solid rgba(232, 131, 42, 0.3)',
-    color: '#FDBA74',
+    background: 'rgba(232, 131, 42, 0.08)',
+    border: '1px solid rgba(232, 131, 42, 0.2)',
+    color: 'var(--accent)',
     padding: '0.3rem 0.75rem',
-    borderRadius: '0px',
     textTransform: 'uppercase' as const,
     letterSpacing: '0.05em',
     marginBottom: '1rem',
   },
   cardTitle: {
-    fontFamily: 'var(--font-outfit)',
+    fontFamily: 'var(--font-title)',
     fontSize: '1.5rem',
     fontWeight: '700',
-    color: '#FFF',
+    color: 'var(--text-dark)',
     marginBottom: '0.5rem',
   },
   cardDate: {
     fontSize: '0.85rem',
-    color: '#E2E8F0',
-    opacity: 0.9,
+    color: 'var(--text-dark)',
     display: 'block',
     marginBottom: '1rem',
     fontWeight: '600',
   },
   cardDescription: {
     fontSize: '0.9rem',
-    color: '#94A3B8',
+    color: 'var(--text-muted)',
     lineHeight: '1.6',
     marginBottom: '1.5rem',
   },
   infoBox: {
     fontSize: '0.8rem',
-    background: 'rgba(232, 131, 42, 0.08)',
+    background: 'rgba(232, 131, 42, 0.04)',
     borderLeft: '3px solid var(--accent)',
     padding: '0.75rem 1rem',
-    borderRadius: '0px',
-    color: '#FDBA74',
+    color: 'var(--accent)',
     lineHeight: '1.5',
     marginBottom: '1.5rem',
   },
@@ -202,13 +187,13 @@ const styles = {
     display: 'block',
   },
   footer: {
-    borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+    borderTop: '1px solid #E2E8F0',
     paddingTop: '1.5rem',
     textAlign: 'center' as const,
   },
   footerText: {
     fontSize: '0.8rem',
-    color: '#64748B',
+    color: 'var(--text-muted)',
     maxWidth: '650px',
     margin: '0 auto',
     lineHeight: '1.5',

@@ -9,9 +9,7 @@ export default function InscriptionDelegues() {
   const [state, formAction, pending] = useActionState(submitInscriptionDelegue, null);
 
   return (
-    <main style={styles.page} className="grid-bg theme-dark animate-fade-in">
-      <div style={styles.overlay}></div>
-
+    <main style={styles.page} className="animate-fade-in">
       <div style={styles.container} className="animate-slide-up">
         {/* Back Link */}
         <div style={styles.navContainer}>
@@ -20,7 +18,7 @@ export default function InscriptionDelegues() {
           </Link>
         </div>
 
-        <div style={styles.formCard} className="glass">
+        <div style={styles.formCard}>
           <header style={styles.header}>
             <span style={styles.badge}>OJEMAO Congrès</span>
             <h1 style={styles.title}>Espace Délégués</h1>
@@ -83,7 +81,7 @@ export default function InscriptionDelegues() {
                   label="Nom & Prénom"
                   name="nom_prenom"
                   required={true}
-                  placeholder="Ex: Malik Kouton"
+                  placeholder="Ex: Vahama Kamagaté"
                 />
 
                 <FormField
@@ -189,7 +187,7 @@ export default function InscriptionDelegues() {
               </div>
 
               <div style={styles.consentContainer}>
-                <input type="checkbox" id="consent" required style={styles.checkbox} />
+                <input type="checkbox" id="consent" name="consent" required style={styles.checkbox} />
                 <label htmlFor="consent" style={styles.consentLabel}>
                   Je confirme l'exactitude des informations fournies pour le compte de ma délégation.
                 </label>
@@ -198,7 +196,7 @@ export default function InscriptionDelegues() {
               <button
                 type="submit"
                 disabled={pending}
-                className="btn btn-primary"
+                className="btn btn-secondary"
                 style={styles.submitBtn}
               >
                 {pending ? 'Enregistrement...' : 'Enregistrer ma délégation'}
@@ -213,29 +211,16 @@ export default function InscriptionDelegues() {
 
 const styles = {
   page: {
-    position: 'relative' as const,
     minHeight: '100vh',
     display: 'flex',
     flexDirection: 'column' as const,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: '3rem 1.5rem',
-    overflowX: 'hidden' as const,
-  },
-  overlay: {
-    position: 'absolute' as const,
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    background: 'radial-gradient(circle at center, transparent 30%, rgba(7, 15, 27, 0.8) 100%)',
-    pointerEvents: 'none' as const,
-    zIndex: 1,
+    padding: '2rem 1rem',
+    background: '#FFFFFF',
   },
   container: {
-    position: 'relative' as const,
-    zIndex: 2,
-    maxWidth: '750px',
+    maxWidth: '900px',
     width: '100%',
     display: 'flex',
     flexDirection: 'column' as const,
@@ -247,23 +232,25 @@ const styles = {
     marginBottom: '1.5rem',
   },
   backLink: {
-    color: '#94A3B8',
+    color: 'var(--text-muted)',
     fontSize: '0.9rem',
     fontWeight: '500',
   },
   formCard: {
-    padding: '3rem 2.5rem',
-    borderRadius: '0px',
-    boxShadow: 'var(--shadow-lg)',
+    padding: '2rem 1.5rem',
+    borderRadius: '16px',
+    backgroundColor: '#FFFFFF',
+    boxShadow: '0 10px 40px -10px rgba(0,0,0,0.08)',
+    border: '1px solid rgba(226, 232, 240, 0.6)',
   },
   header: {
     textAlign: 'center' as const,
     marginBottom: '2.5rem',
   },
   badge: {
-    background: 'rgba(255, 255, 255, 0.08)',
-    border: '1px solid rgba(255, 255, 255, 0.15)',
-    color: '#FFF',
+    background: 'rgba(3, 67, 137, 0.08)',
+    border: '1px solid rgba(3, 67, 137, 0.2)',
+    color: 'var(--secondary)',
     padding: '0.3rem 0.8rem',
     borderRadius: '0px',
     fontSize: '0.75rem',
@@ -271,39 +258,39 @@ const styles = {
     letterSpacing: '0.05em',
   },
   title: {
-    fontFamily: 'var(--font-outfit)',
+    fontFamily: 'var(--font-title)',
     fontSize: '2.25rem',
     fontWeight: '800',
-    color: '#FFF',
+    color: 'var(--text-dark)',
     marginTop: '0.5rem',
     marginBottom: '0.25rem',
   },
   subtitle: {
     fontSize: '0.95rem',
-    color: '#94A3B8',
+    color: 'var(--text-muted)',
   },
   dateBanner: {
     fontSize: '0.85rem',
-    color: '#E2E8F0',
-    background: 'rgba(255, 255, 255, 0.03)',
+    color: 'var(--text-dark)',
+    background: '#F8FAFC',
     padding: '0.5rem 1rem',
     borderRadius: '0px',
     display: 'inline-block',
     marginTop: '1rem',
     fontWeight: '600',
-    border: '1px solid rgba(255, 255, 255, 0.05)',
+    border: '1px solid #E2E8F0',
   },
   sectionTitle: {
-    fontFamily: 'var(--font-outfit)',
+    fontFamily: 'var(--font-title)',
     fontSize: '1.2rem',
     fontWeight: '700',
-    color: '#FFF',
+    color: 'var(--text-dark)',
     marginBottom: '1rem',
     textAlign: 'left' as const,
   },
   sectionSubtitle: {
     fontSize: '0.85rem',
-    color: '#94A3B8',
+    color: 'var(--text-muted)',
     marginBottom: '1.25rem',
     textAlign: 'left' as const,
     lineHeight: '1.4',
@@ -311,7 +298,7 @@ const styles = {
   sectionDivider: {
     width: '100%',
     height: '1px',
-    background: 'rgba(255, 255, 255, 0.08)',
+    background: '#E2E8F0',
     margin: '1.5rem 0',
   },
   form: {
@@ -320,15 +307,15 @@ const styles = {
   },
   grid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 250px), 1fr))',
     gap: '0 1.25rem',
   },
   errorAlert: {
-    background: 'rgba(239, 68, 68, 0.1)',
+    background: '#FEF2F2',
     borderLeft: '4px solid #EF4444',
     padding: '1rem',
     borderRadius: '0px',
-    color: '#FCA5A5',
+    color: '#B91C1C',
     fontSize: '0.9rem',
     marginBottom: '1.5rem',
     textAlign: 'left' as const,
@@ -342,14 +329,14 @@ const styles = {
   },
   checkbox: {
     marginTop: '0.2rem',
-    accentColor: 'var(--accent)',
+    accentColor: 'var(--secondary)',
     width: '16px',
     height: '16px',
     cursor: 'pointer',
   },
   consentLabel: {
     fontSize: '0.85rem',
-    color: '#94A3B8',
+    color: 'var(--text-muted)',
     lineHeight: '1.4',
     cursor: 'pointer',
   },
@@ -366,9 +353,9 @@ const styles = {
     width: '64px',
     height: '64px',
     borderRadius: '0px',
-    background: 'rgba(255, 255, 255, 0.05)',
-    border: '2px solid #FFF',
-    color: '#FFF',
+    background: 'rgba(3, 67, 137, 0.08)',
+    border: '2px solid var(--secondary)',
+    color: 'var(--secondary)',
     fontSize: '2.5rem',
     lineHeight: '60px',
     margin: '0 auto 1.5rem auto',
@@ -377,14 +364,14 @@ const styles = {
     justifyContent: 'center',
   },
   successTitle: {
-    fontFamily: 'var(--font-outfit)',
+    fontFamily: 'var(--font-title)',
     fontSize: '1.75rem',
     fontWeight: '700',
-    color: '#FFF',
+    color: 'var(--text-dark)',
     marginBottom: '0.75rem',
   },
   successText: {
-    color: '#94A3B8',
+    color: 'var(--text-muted)',
     fontSize: '1rem',
     lineHeight: '1.5',
     maxWidth: '500px',
