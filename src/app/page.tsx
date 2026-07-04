@@ -125,7 +125,7 @@ const styles = {
   logoBadge: {
     background: 'linear-gradient(135deg, var(--primary) 0%, #2da85a 100%)',
     padding: '0.5rem 1.25rem',
-    borderRadius: '50px',
+    borderRadius: '0px',
     boxShadow: 'var(--shadow-md)',
   },
   logoText: {
@@ -140,7 +140,7 @@ const styles = {
     border: '1px solid rgba(232, 131, 42, 0.3)',
     color: 'var(--accent)',
     padding: '0.4rem 1rem',
-    borderRadius: '50px',
+    borderRadius: '0px',
     fontSize: '0.8rem',
     fontWeight: '600',
     letterSpacing: '0.05em',
@@ -170,7 +170,6 @@ const styles = {
     height: '4px',
     background: 'var(--accent)',
     margin: '1.5rem auto',
-    borderRadius: '2px',
   },
   description: {
     fontSize: '1.1rem',
@@ -190,7 +189,7 @@ const styles = {
   },
   eventCard: {
     padding: '2rem',
-    borderRadius: '16px',
+    borderRadius: '0px',
     display: 'flex',
     flexDirection: 'column' as const,
     justifyContent: 'space-between',
@@ -231,7 +230,7 @@ const styles = {
     border: '1px solid rgba(45, 168, 90, 0.3)',
     color: '#4ADE80',
     padding: '0.3rem 0.75rem',
-    borderRadius: '4px',
+    borderRadius: '0px',
   },
   badgeReservation: {
     display: 'inline-block',
@@ -241,7 +240,7 @@ const styles = {
     border: '1px solid rgba(232, 131, 42, 0.3)',
     color: '#FDBA74',
     padding: '0.3rem 0.75rem',
-    borderRadius: '4px',
+    borderRadius: '0px',
   },
   footer: {
     borderTop: '1px solid rgba(255, 255, 255, 0.08)',

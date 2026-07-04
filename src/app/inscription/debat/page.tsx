@@ -241,7 +241,7 @@ const styles = {
   },
   formCard: {
     padding: '3rem 2.5rem',
-    borderRadius: '16px',
+    borderRadius: '0px',
     boxShadow: 'var(--shadow-lg)',
   },
   header: {
@@ -253,7 +253,7 @@ const styles = {
     border: '1px solid rgba(27, 122, 61, 0.3)',
     color: 'var(--primary)',
     padding: '0.3rem 0.8rem',
-    borderRadius: '50px',
+    borderRadius: '0px',
     fontSize: '0.75rem',
     fontWeight: '700',
     letterSpacing: '0.05em',
@@ -275,7 +275,7 @@ const styles = {
     color: '#E2E8F0',
     background: 'rgba(255, 255, 255, 0.03)',
     padding: '0.5rem 1rem',
-    borderRadius: '8px',
+    borderRadius: '0px',
     display: 'inline-block',
     marginTop: '1rem',
     fontWeight: '600',
@@ -306,7 +306,7 @@ const styles = {
   select: {
     width: '100%',
     padding: '0.75rem 1rem',
-    borderRadius: '8px',
+    borderRadius: '0px',
     border: '1px solid rgba(255, 255, 255, 0.1)',
     background: 'rgba(255, 255, 255, 0.03)',
     color: '#FFFFFF',
@@ -320,7 +320,7 @@ const styles = {
     background: 'rgba(239, 68, 68, 0.1)',
     borderLeft: '4px solid #EF4444',
     padding: '1rem',
-    borderRadius: '6px',
+    borderRadius: '0px',
     color: '#FCA5A5',
     fontSize: '0.9rem',
     marginBottom: '1.5rem',
@@ -358,7 +358,7 @@ const styles = {
   successIcon: {
     width: '64px',
     height: '64px',
-    borderRadius: '50%',
+    borderRadius: '0px',
     background: 'rgba(45, 168, 90, 0.15)',
     border: '2px solid var(--primary)',
     color: '#4ADE80',

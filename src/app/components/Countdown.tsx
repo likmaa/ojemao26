@@ -100,7 +100,7 @@ const styles = {
   card: {
     background: 'rgba(255, 255, 255, 0.04)',
     border: '1px solid rgba(255, 255, 255, 0.08)',
-    borderRadius: '12px',
+    borderRadius: '0px',
     padding: '1.25rem 0.5rem',
     display: 'flex',
     flexDirection: 'column' as const,
@@ -111,7 +111,7 @@ const styles = {
   cardSkeleton: {
     background: 'rgba(255, 255, 255, 0.02)',
     border: '1px solid rgba(255, 255, 255, 0.04)',
-    borderRadius: '12px',
+    borderRadius: '0px',
     padding: '1.25rem 0.5rem',
     display: 'flex',
     flexDirection: 'column' as const,
