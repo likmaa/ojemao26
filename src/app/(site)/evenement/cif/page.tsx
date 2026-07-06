@@ -154,7 +154,7 @@ export default async function CifPage() {
               </div>
               <div style={styles.infoItem}>
                 <span style={styles.infoLabel}><FaTicketAlt style={{ marginRight: '0.4rem' }} /> ACCÈS COLLOQUE</span>
-                <span style={styles.infoVal}>Sur réservation (Paiement sur place)</span>
+                <span style={styles.infoVal}>Gratuit (sur validation). Hébergement/Restauration à la charge des non-validés.</span>
               </div>
               <div style={styles.infoItem}>
                 <span style={styles.infoLabel}><FaInfoCircle style={{ marginRight: '0.4rem' }} /> ACCÈS CONGRÈS</span>
@@ -180,10 +180,10 @@ export default async function CifPage() {
             <div style={{ ...styles.sidebarBox, borderLeft: '4px solid var(--accent)', background: 'rgba(232, 131, 42, 0.03)' }} className="glass sidebar-box">
               <h3 style={styles.sidebarTitle}>Faire ma réservation</h3>
               <p style={styles.sidebarText}>
-                Pour participer au Colloque (panels, ateliers et matériel), effectuez votre réservation en ligne. Le règlement des frais s'effectuera directement lors de votre enregistrement physique à Cotonou.
+                Pour participer au Colloque (panels, ateliers et matériel), effectuez votre inscription en ligne. L'accès est gratuit pour les participants validés par leur pays et la commission. Pour les autres, l'hébergement et la restauration resteront à leur charge.
               </p>
               <Link href="/inscription/cif" className="btn btn-accent" style={styles.ctaBtn}>
-                Réserver ma place CIF
+                S'inscrire au CIF
               </Link>
             </div>
           </div>

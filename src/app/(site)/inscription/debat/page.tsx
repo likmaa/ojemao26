@@ -360,6 +360,10 @@ export default function InscriptionDebat() {
                 </div>
               )}
 
+              <div style={{ padding: '1rem', background: '#F1F5F9', borderLeft: '4px solid #3B82F6', borderRadius: '4px', marginBottom: '1.5rem', fontSize: '0.95rem', color: '#334155' }}>
+                <strong>Note :</strong> L'accès au Débat est <strong>gratuit pour les résidents locaux (Bénin)</strong>. Les participants internationaux devront s'acquitter de frais de participation s'élevant à <strong>20 000 FCFA</strong>.
+              </div>
+
               <div style={styles.consentContainer}>
                 <input type="checkbox" id="consent" name="consent" required style={styles.checkbox} />
                 <label htmlFor="consent" style={styles.consentLabel}>

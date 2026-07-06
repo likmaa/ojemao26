@@ -249,7 +249,7 @@ export default async function DebatPage() {
               </div>
               <div style={styles.infoItem}>
                 <span style={styles.infoLabel}><FaTicketAlt style={{ marginRight: '0.4rem' }} /> ACCÈS</span>
-                <span style={styles.infoVal}>Gratuit, Inscription obligatoire</span>
+                <span style={styles.infoVal}>Gratuit (locaux) / 20 000 FCFA (internationaux)</span>
               </div>
               
               <div style={{ marginTop: '1.5rem' }}>
@@ -274,7 +274,7 @@ export default async function DebatPage() {
                 Les places sont limitées en raison de la capacité d'accueil de la salle. Enregistrez-vous dès maintenant pour garantir votre accès.
               </p>
               <Link href="/inscription/debat" className="btn btn-primary" style={styles.ctaBtn}>
-                S'inscrire gratuitement
+                S'inscrire à l'événement
               </Link>
             </div>
           </div>

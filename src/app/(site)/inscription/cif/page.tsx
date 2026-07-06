@@ -25,7 +25,7 @@ export default function InscriptionCif() {
             <span style={styles.badge}>CIF 2026</span>
             <h1 style={styles.title}>Colloque International (CIF)</h1>
             <p style={styles.subtitle}>
-              Formulaire de réservation — Participation avec règlement sur place
+              Formulaire d'inscription au Colloque International
             </p>
             <div style={styles.dateBanner}>
               📅 26 au 28 Juillet 2026 | 📍 Cotonou, ONG Direct Aid
@@ -216,10 +216,14 @@ export default function InscriptionCif() {
                 placeholder="Décrivez brièvement vos attentes ou ce que vous espérez apprendre..."
               />
 
+              <div style={{ padding: '1rem', background: '#FFF7ED', borderLeft: '4px solid #EA580C', borderRadius: '4px', marginBottom: '1.5rem', fontSize: '0.95rem', color: '#431407' }}>
+                <strong>Note :</strong> La participation au CIF est <strong>gratuite pour les participants validés par leur pays et la commission</strong>. L'hébergement et la restauration seront à la charge des autres participants non validés.
+              </div>
+
               <div style={styles.consentContainer}>
                 <input type="checkbox" id="consent" name="consent" required style={styles.checkbox} />
                 <label htmlFor="consent" style={styles.consentLabel}>
-                  J'accepte que mes données soient collectées pour les besoins d'organisation et je m'engage à régler mes frais de participation à mon arrivée sur le site.
+                  J'accepte que mes données soient collectées pour les besoins d'organisation et de communication liés à l'événement.
                 </label>
               </div>
 
