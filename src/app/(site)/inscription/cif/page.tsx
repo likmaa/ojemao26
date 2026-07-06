@@ -217,7 +217,7 @@ export default function InscriptionCif() {
               />
 
               <div style={{ padding: '1rem', background: '#FFF7ED', borderLeft: '4px solid #EA580C', borderRadius: '4px', marginBottom: '1.5rem', fontSize: '0.95rem', color: '#431407' }}>
-                <strong>Note :</strong> Les frais de participation au CIF sont fixés à <strong>10 000 FCFA</strong> pour tous les participants. L'hébergement et la restauration sont à votre charge.
+                <strong>Note :</strong> Les frais de participation au CIF sont fixés à <strong>10 000 FCFA</strong> pour tous. L'hébergement et la restauration sont pris en charge <strong>uniquement pour les participants validés par la délégation de leur pays</strong>. Les autres participants devront les prendre à leur charge.
               </div>
 
               <div style={styles.consentContainer}>

@@ -180,7 +180,7 @@ export default async function CifPage() {
             <div style={{ ...styles.sidebarBox, borderLeft: '4px solid var(--accent)', background: 'rgba(232, 131, 42, 0.03)' }} className="glass sidebar-box">
               <h3 style={styles.sidebarTitle}>Faire ma réservation</h3>
               <p style={styles.sidebarText}>
-                Pour participer au Colloque (panels, ateliers et matériel), effectuez votre inscription en ligne. Les frais de participation sont fixés à <strong>10 000 FCFA</strong> pour tous. Le règlement s'effectuera lors de votre enregistrement physique à Cotonou.
+                Pour participer au Colloque (panels, ateliers et matériel), effectuez votre inscription en ligne. Les frais de participation sont fixés à <strong>10 000 FCFA</strong> pour tous. L'hébergement et la restauration sont pris en charge pour les participants validés par la délégation de leur pays, mais restent à la charge des participants non validés.
               </p>
               <Link href="/inscription/cif" className="btn btn-accent" style={styles.ctaBtn}>
                 S'inscrire au CIF
