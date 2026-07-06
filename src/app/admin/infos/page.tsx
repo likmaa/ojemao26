@@ -17,11 +17,21 @@ type Contact = {
   icon_type: string;
 };
 
+type FocalPoint = {
+  id: string;
+  country: string;
+  flag: string;
+  name: string;
+  phone: string;
+  wa: string;
+};
+
 export default function InfosAdminPage() {
-  const [activeTab, setActiveTab] = useState<'accommodations' | 'contacts'>('accommodations');
+  const [activeTab, setActiveTab] = useState<'accommodations' | 'contacts' | 'focal_points'>('accommodations');
   
   const [accommodations, setAccommodations] = useState<Accommodation[]>([]);
   const [contacts, setContacts] = useState<Contact[]>([]);
+  const [focalPoints, setFocalPoints] = useState<FocalPoint[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Form states for accommodations
@@ -29,6 +39,9 @@ export default function InfosAdminPage() {
   
   // Form states for contacts
   const [contactForm, setContactForm] = useState({ id: '', label: '', value: '', icon_type: 'phone' });
+
+  // Form states for focal points
+  const [focalForm, setFocalForm] = useState({ id: '', country: '', flag: '', name: '', phone: '', wa: '' });
 
   useEffect(() => {
     fetchData();
@@ -41,6 +54,10 @@ export default function InfosAdminPage() {
 
     const { data: conData } = await supabase.from('contacts').select('*').order('created_at', { ascending: true });
     if (conData) setContacts(conData);
+
+    const { data: fpData } = await supabase.from('focal_points').select('*').order('country', { ascending: true });
+    if (fpData) setFocalPoints(fpData);
+    
     setLoading(false);
   };
 
@@ -102,6 +119,39 @@ export default function InfosAdminPage() {
     }
   };
 
+  const handleSaveFocal = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (focalForm.id) {
+      const { error } = await supabase.from('focal_points').update({
+        country: focalForm.country,
+        flag: focalForm.flag,
+        name: focalForm.name,
+        phone: focalForm.phone,
+        wa: focalForm.wa
+      }).eq('id', focalForm.id);
+      if (error) alert("Erreur lors de la modification : " + error.message);
+    } else {
+      const { error } = await supabase.from('focal_points').insert([{
+        country: focalForm.country,
+        flag: focalForm.flag,
+        name: focalForm.name,
+        phone: focalForm.phone,
+        wa: focalForm.wa
+      }]);
+      if (error) alert("Erreur lors de l'ajout : " + error.message);
+    }
+    setFocalForm({ id: '', country: '', flag: '', name: '', phone: '', wa: '' });
+    fetchData();
+  };
+
+  const handleDeleteFocal = async (id: string) => {
+    if (confirm('Supprimer ce point focal ?')) {
+      const { error } = await supabase.from('focal_points').delete().eq('id', id);
+      if (error) alert("Erreur lors de la suppression : " + error.message);
+      fetchData();
+    }
+  };
+
   return (
     <div style={styles.container}>
       <header style={styles.header}>
@@ -121,6 +171,12 @@ export default function InfosAdminPage() {
           onClick={() => setActiveTab('contacts')}
         >
           📞 Contacts du Comité
+        </button>
+        <button 
+          style={{...styles.tab, ...(activeTab === 'focal_points' ? styles.activeTab : {})}}
+          onClick={() => setActiveTab('focal_points')}
+        >
+          🌍 Points Focaux
         </button>
       </div>
 
@@ -225,6 +281,65 @@ export default function InfosAdminPage() {
                       </div>
                     ))}
                     {contacts.length === 0 && <p style={styles.empty}>Aucun contact enregistré.</p>}
+                  </div>
+                </div>
+              </div>
+            )}
+            {/* FOCAL POINTS TAB */}
+            {activeTab === 'focal_points' && (
+              <div style={styles.grid}>
+                <div style={styles.formSection}>
+                  <h2 style={styles.sectionTitle}>{focalForm.id ? 'Modifier' : 'Ajouter'} un point focal</h2>
+                  <form onSubmit={handleSaveFocal} style={styles.form}>
+                    <div style={styles.inputGroup}>
+                      <label style={styles.label}>Pays</label>
+                      <input type="text" value={focalForm.country} onChange={(e) => setFocalForm({...focalForm, country: e.target.value})} style={styles.input} required placeholder="Ex: Bénin" />
+                    </div>
+                    <div style={styles.inputGroup}>
+                      <label style={styles.label}>Drapeau (Emoji)</label>
+                      <input type="text" value={focalForm.flag} onChange={(e) => setFocalForm({...focalForm, flag: e.target.value})} style={styles.input} required placeholder="Ex: 🇧🇯" />
+                    </div>
+                    <div style={styles.inputGroup}>
+                      <label style={styles.label}>Nom du représentant</label>
+                      <input type="text" value={focalForm.name} onChange={(e) => setFocalForm({...focalForm, name: e.target.value})} style={styles.input} required placeholder="Ex: El Hadj Soulémane" />
+                    </div>
+                    <div style={styles.inputGroup}>
+                      <label style={styles.label}>Téléphone affiché</label>
+                      <input type="text" value={focalForm.phone} onChange={(e) => setFocalForm({...focalForm, phone: e.target.value})} style={styles.input} required placeholder="Ex: +229 97 12 34 56" />
+                    </div>
+                    <div style={styles.inputGroup}>
+                      <label style={styles.label}>WhatsApp (Sans '+' ni espaces)</label>
+                      <input type="text" value={focalForm.wa} onChange={(e) => setFocalForm({...focalForm, wa: e.target.value})} style={styles.input} required placeholder="Ex: 22997123456" />
+                    </div>
+                    <div style={styles.formActions}>
+                      {focalForm.id && (
+                        <button type="button" onClick={() => setFocalForm({ id: '', country: '', flag: '', name: '', phone: '', wa: '' })} style={styles.cancelBtn}>Annuler</button>
+                      )}
+                      <button type="submit" style={styles.submitBtn}>Enregistrer</button>
+                    </div>
+                  </form>
+                </div>
+
+                <div style={styles.listSection}>
+                  <h2 style={styles.sectionTitle}>Liste des Points Focaux</h2>
+                  <div style={styles.list}>
+                    {focalPoints.map(fp => (
+                      <div key={fp.id} style={styles.card}>
+                        <div style={styles.cardHeader}>
+                          <h3 style={styles.cardTitle}>{fp.flag} {fp.country}</h3>
+                        </div>
+                        <p style={styles.cardText}>
+                          Représentant : <strong>{fp.name}</strong><br />
+                          Tél : <span style={{color: 'var(--primary)'}}>{fp.phone}</span><br />
+                          WhatsApp payload : <span style={{color: 'var(--accent)', fontSize: '0.85rem'}}>{fp.wa}</span>
+                        </p>
+                        <div style={styles.cardActions}>
+                          <button onClick={() => setFocalForm(fp)} style={styles.editBtn}>✏️ Modifier</button>
+                          <button onClick={() => handleDeleteFocal(fp.id)} style={styles.deleteBtn}>🗑️ Supprimer</button>
+                        </div>
+                      </div>
+                    ))}
+                    {focalPoints.length === 0 && <p style={styles.empty}>Aucun point focal enregistré.</p>}
                   </div>
                 </div>
               </div>

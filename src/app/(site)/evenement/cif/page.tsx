@@ -20,6 +20,9 @@ export default async function CifPage() {
   const { data: eventRow } = await supabase.from('events').select('image_url').eq('title', 'cif').maybeSingle();
   const cifImage = eventRow?.image_url || '/images/affiche-co1.webp';
 
+  const { data: dbFocalPoints } = await supabase.from('focal_points').select('*').order('country', { ascending: true });
+  const activeFocalPoints = dbFocalPoints && dbFocalPoints.length > 0 ? dbFocalPoints : focalPoints;
+
   return (
     <div style={styles.page} className="animate-fade-in">
       <div style={styles.container}>
@@ -196,7 +199,7 @@ export default async function CifPage() {
                 Contactez les représentants officiels de votre pays pour toute question d'organisation :
               </p>
               <div style={styles.focalGrid}>
-                {focalPoints.map((fp, idx) => (
+                {activeFocalPoints.map((fp, idx) => (
                   <div key={idx} style={styles.focalItem}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                       <span style={{ fontSize: '1.2rem' }}>{fp.flag}</span>

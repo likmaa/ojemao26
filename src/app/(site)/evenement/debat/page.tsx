@@ -20,6 +20,9 @@ export default async function DebatPage() {
   const { data: eventRow } = await supabase.from('events').select('image_url').eq('title', 'debat').maybeSingle();
   const debatImage = eventRow?.image_url || '/images/affiche-d1.webp';
 
+  const { data: dbFocalPoints } = await supabase.from('focal_points').select('*').order('country', { ascending: true });
+  const activeFocalPoints = dbFocalPoints && dbFocalPoints.length > 0 ? dbFocalPoints : focalPoints;
+
   return (
     <div style={styles.page} className="animate-fade-in">
       <div style={styles.container}>
@@ -287,7 +290,7 @@ export default async function DebatPage() {
                 Contactez les représentants officiels de votre pays pour toute question d'organisation :
               </p>
               <div style={styles.focalGrid}>
-                {focalPoints.map((fp, idx) => (
+                {activeFocalPoints.map((fp, idx) => (
                   <div key={idx} style={styles.focalItem}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                       <span style={{ fontSize: '1.2rem' }}>{fp.flag}</span>
