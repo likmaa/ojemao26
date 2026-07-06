@@ -5,6 +5,17 @@ import { supabase } from '@/app/lib/supabase';
 
 export const revalidate = 0;
 
+const focalPoints = [
+  { flag: '🇧🇯', country: 'Bénin', name: 'El Hadj Soulémane', phone: '+229 97 12 34 56', wa: '22997123456' },
+  { flag: '🇹🇬', country: 'Togo', name: 'Ibrahim Touré', phone: '+228 90 12 34 56', wa: '22890123456' },
+  { flag: '🇨🇮', country: 'Côte d\'Ivoire', name: 'Amadou Koné', phone: '+225 07 12 34 56 78', wa: '2250712345678' },
+  { flag: '🇲🇱', country: 'Mali', name: 'Ousmane Maïga', phone: '+223 70 12 34 56', wa: '22370123456' },
+  { flag: '🇳🇪', country: 'Niger', name: 'Abdoul Karim', phone: '+227 90 12 34 56', wa: '22790123456' },
+  { flag: '🇧🇫', country: 'Burkina Faso', name: 'Moussa Sawadogo', phone: '+226 70 12 34 56', wa: '22670123456' },
+  { flag: '🇸🇳', country: 'Sénégal', name: 'Cheikh Diallo', phone: '+221 77 123 45 67', wa: '221771234567' },
+  { flag: '🇬🇳', country: 'Guinée', name: 'Mamadou Barry', phone: '+224 620 12 34 56', wa: '224620123456' },
+];
+
 export default async function CifPage() {
   const { data: eventRow } = await supabase.from('events').select('image_url').eq('title', 'cif').maybeSingle();
   const cifImage = eventRow?.image_url || '/images/affiche-co1.webp';
@@ -144,21 +155,23 @@ export default async function CifPage() {
             {/* Info Box */}
             <div style={styles.sidebarBox} className="glass sidebar-box">
               <h3 style={styles.sidebarTitle}>Informations Clés</h3>
-              <div style={styles.infoItem}>
-                <span style={styles.infoLabel}><FaCalendarAlt style={{ marginRight: '0.4rem' }} /> DATES</span>
-                <span style={styles.infoVal}>Dim. 26 au Mar. 28 Juillet 2026</span>
-              </div>
-              <div style={styles.infoItem}>
-                <span style={styles.infoLabel}><FaMapMarkerAlt style={{ marginRight: '0.4rem' }} /> LIEU</span>
-                <span style={styles.infoVal}>Direct'Aid Fidjrossè (Ex AMA), Cotonou</span>
-              </div>
-              <div style={styles.infoItem}>
-                <span style={styles.infoLabel}><FaTicketAlt style={{ marginRight: '0.4rem' }} /> ACCÈS COLLOQUE</span>
-                <span style={styles.infoVal}>10 000 FCFA (pour tous les participants)</span>
-              </div>
-              <div style={styles.infoItem}>
-                <span style={styles.infoLabel}><FaInfoCircle style={{ marginRight: '0.4rem' }} /> ACCÈS CONGRÈS</span>
-                <span style={styles.infoVal}>Réservé aux délégués mandatés</span>
+              <div style={styles.infoItemsGrid}>
+                <div style={styles.infoItem}>
+                  <span style={styles.infoLabel}><FaCalendarAlt style={{ marginRight: '0.4rem' }} /> DATES</span>
+                  <span style={styles.infoVal}>Dim. 26 au Mar. 28 Juillet 2026</span>
+                </div>
+                <div style={styles.infoItem}>
+                  <span style={styles.infoLabel}><FaMapMarkerAlt style={{ marginRight: '0.4rem' }} /> LIEU</span>
+                  <span style={styles.infoVal}>Direct'Aid Fidjrossè (Ex AMA), Cotonou</span>
+                </div>
+                <div style={styles.infoItem}>
+                  <span style={styles.infoLabel}><FaTicketAlt style={{ marginRight: '0.4rem' }} /> ACCÈS COLLOQUE</span>
+                  <span style={styles.infoVal}>10 000 FCFA (pour tous les participants)</span>
+                </div>
+                <div style={styles.infoItem}>
+                  <span style={styles.infoLabel}><FaInfoCircle style={{ marginRight: '0.4rem' }} /> ACCÈS CONGRÈS</span>
+                  <span style={styles.infoVal}>Réservé aux délégués mandatés</span>
+                </div>
               </div>
               
               <div style={{ marginTop: '1.5rem' }}>
@@ -173,6 +186,35 @@ export default async function CifPage() {
                   referrerPolicy="no-referrer-when-downgrade"
                   title="Carte Direct Aid Fidjrossè"
                 ></iframe>
+              </div>
+            </div>
+
+            {/* Focal Points Box */}
+            <div style={styles.sidebarBox} className="glass sidebar-box">
+              <h3 style={styles.sidebarTitle}>Points Focaux par Pays</h3>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1rem', lineHeight: '1.4' }}>
+                Contactez les représentants officiels de votre pays pour toute question d'organisation :
+              </p>
+              <div style={styles.focalGrid}>
+                {focalPoints.map((fp, idx) => (
+                  <div key={idx} style={styles.focalItem}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <span style={{ fontSize: '1.2rem' }}>{fp.flag}</span>
+                      <strong style={{ fontSize: '0.9rem', color: 'var(--text-dark)' }}>{fp.country}</strong>
+                    </div>
+                    <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>
+                      {fp.name}
+                    </div>
+                    <a
+                      href={`https://wa.me/${fp.wa}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={styles.focalPhone}
+                    >
+                      WhatsApp : {fp.phone}
+                    </a>
+                  </div>
+                ))}
               </div>
             </div>
 
@@ -353,13 +395,20 @@ const styles = {
     textTransform: 'uppercase' as const,
     letterSpacing: '0.05em',
   },
+  infoItemsGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+    gap: '1rem',
+    marginBottom: '1rem',
+  },
   infoItem: {
     display: 'flex',
     flexDirection: 'column' as const,
     gap: '0.25rem',
-    paddingBottom: '1rem',
-    borderBottom: '1px solid #F1F5F9',
-    marginBottom: '1rem',
+    padding: '0.75rem',
+    background: '#F8FAFC',
+    border: '1px solid #E2E8F0',
+    borderRadius: '6px',
   },
   infoLabel: {
     fontSize: '0.7rem',
@@ -371,6 +420,26 @@ const styles = {
     fontSize: '0.95rem',
     fontWeight: '600',
     color: 'var(--text-dark)',
+  },
+  focalGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+    gap: '0.75rem',
+  },
+  focalItem: {
+    padding: '0.75rem',
+    background: '#F8FAFC',
+    border: '1px solid #E2E8F0',
+    borderRadius: '6px',
+    display: 'flex',
+    flexDirection: 'column' as const,
+  },
+  focalPhone: {
+    fontSize: '0.8rem',
+    color: 'var(--primary)',
+    textDecoration: 'none',
+    fontWeight: '600',
+    marginTop: '0.25rem',
   },
   sidebarText: {
     fontSize: '0.85rem',
