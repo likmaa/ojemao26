@@ -154,7 +154,7 @@ export default async function CifPage() {
               </div>
               <div style={styles.infoItem}>
                 <span style={styles.infoLabel}><FaTicketAlt style={{ marginRight: '0.4rem' }} /> ACCÈS COLLOQUE</span>
-                <span style={styles.infoVal}>Gratuit (sur validation). Hébergement/Restauration à la charge des non-validés.</span>
+                <span style={styles.infoVal}>10 000 FCFA (pour tous les participants)</span>
               </div>
               <div style={styles.infoItem}>
                 <span style={styles.infoLabel}><FaInfoCircle style={{ marginRight: '0.4rem' }} /> ACCÈS CONGRÈS</span>
@@ -180,7 +180,7 @@ export default async function CifPage() {
             <div style={{ ...styles.sidebarBox, borderLeft: '4px solid var(--accent)', background: 'rgba(232, 131, 42, 0.03)' }} className="glass sidebar-box">
               <h3 style={styles.sidebarTitle}>Faire ma réservation</h3>
               <p style={styles.sidebarText}>
-                Pour participer au Colloque (panels, ateliers et matériel), effectuez votre inscription en ligne. L'accès est gratuit pour les participants validés par leur pays et la commission. Pour les autres, l'hébergement et la restauration resteront à leur charge.
+                Pour participer au Colloque (panels, ateliers et matériel), effectuez votre inscription en ligne. Les frais de participation sont fixés à <strong>10 000 FCFA</strong> pour tous. Le règlement s'effectuera lors de votre enregistrement physique à Cotonou.
               </p>
               <Link href="/inscription/cif" className="btn btn-accent" style={styles.ctaBtn}>
                 S'inscrire au CIF
