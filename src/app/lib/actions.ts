@@ -1,6 +1,6 @@
 'use server';
 
-import { supabase, isSupabaseConfigured } from './supabase';
+import { supabase, supabaseAdmin, isSupabaseConfigured } from './supabase';
 import { InscriptionDebatInput, InscriptionCifInput, InscriptionDelegueInput } from './types';
 import fs from 'fs/promises';
 import path from 'path';
@@ -133,7 +133,7 @@ export async function submitInscriptionDebat(prevState: any, formData: FormData)
   if (isSupabaseConfigured()) {
     try {
       // Check for duplicates
-      const { data: existing } = await supabase
+      const { data: existing } = await supabaseAdmin
         .from('inscriptions_debat')
         .select('id')
         .or(`email.eq.${email},telephone.eq.${telephone},nom_prenom.eq.${nom_prenom}`);
@@ -149,7 +149,7 @@ export async function submitInscriptionDebat(prevState: any, formData: FormData)
       
       if (isPriority) {
         // Count existing priority seats (1 to 100)
-        const { count, error: countError } = await supabase
+        const { count, error: countError } = await supabaseAdmin
           .from('inscriptions_debat')
           .select('*', { count: 'exact', head: true })
           .lte('numero_chaise', 100);
@@ -163,7 +163,7 @@ export async function submitInscriptionDebat(prevState: any, formData: FormData)
         numero_chaise = priorityCount + 1;
       } else {
         // Standard seats (> 100)
-        const { data: maxSeatData, error: maxError } = await supabase
+        const { data: maxSeatData, error: maxError } = await supabaseAdmin
           .from('inscriptions_debat')
           .select('numero_chaise')
           .gt('numero_chaise', 100)
@@ -188,7 +188,7 @@ export async function submitInscriptionDebat(prevState: any, formData: FormData)
         data.immatriculation = `CS-${poste}`;
       }
 
-      const { data: insertedData, error } = await supabase.from('inscriptions_debat').insert([data]).select();
+      const { data: insertedData, error } = await supabaseAdmin.from('inscriptions_debat').insert([data]).select();
       if (error) throw error;
       
       const insertedRow = insertedData[0];
@@ -206,7 +206,7 @@ export async function submitInscriptionDebat(prevState: any, formData: FormData)
         const countryKeywords = ville_pays.split(',').map((s: string) => s.trim()).filter(Boolean);
         const countryName = countryKeywords[countryKeywords.length - 1]; // Dernière partie = pays
         if (countryName) {
-          const { data: focalPoints } = await supabase
+          const { data: focalPoints } = await supabaseAdmin
             .from('focal_points')
             .select('name, email, country')
             .not('email', 'is', null)
@@ -246,7 +246,7 @@ export async function submitInscriptionDebat(prevState: any, formData: FormData)
           comment_connu: comment_connu || 'Formulaire Débat',
         };
         // We ignore the duplicate check error here to let the main registration succeed even if they were already in CIF
-        const { data: insertedCifData } = await supabase.from('inscriptions_cif').insert([cifData]).select();
+        const { data: insertedCifData } = await supabaseAdmin.from('inscriptions_cif').insert([cifData]).select();
         
         if (insertedCifData && insertedCifData.length > 0) {
           await sendConfirmationEmail({
@@ -345,7 +345,7 @@ export async function submitInscriptionCif(prevState: any, formData: FormData) {
   if (isSupabaseConfigured()) {
     try {
       // Check for duplicates
-      const { data: existing } = await supabase
+      const { data: existing } = await supabaseAdmin
         .from('inscriptions_cif')
         .select('id')
         .or(`email.eq.${email},whatsapp.eq.${whatsapp},nom_prenom.eq.${nom_prenom}`);
@@ -354,7 +354,7 @@ export async function submitInscriptionCif(prevState: any, formData: FormData) {
         return { success: false, error: 'Une inscription existe déjà avec ce nom, email ou numéro WhatsApp.' };
       }
 
-      const { data: insertedData, error } = await supabase.from('inscriptions_cif').insert([data]).select();
+      const { data: insertedData, error } = await supabaseAdmin.from('inscriptions_cif').insert([data]).select();
       if (error) throw error;
       
       const insertedRow = insertedData[0];
@@ -371,7 +371,7 @@ export async function submitInscriptionCif(prevState: any, formData: FormData) {
         const countryKeywords = ville_pays.split(',').map((s: string) => s.trim()).filter(Boolean);
         const countryName = countryKeywords[countryKeywords.length - 1];
         if (countryName) {
-          const { data: focalPoints } = await supabase
+          const { data: focalPoints } = await supabaseAdmin
             .from('focal_points')
             .select('name, email, country')
             .not('email', 'is', null)
@@ -461,7 +461,7 @@ export async function submitInscriptionCongres(prevState: any, formData: FormDat
 
   try {
     // Check for duplicates
-    const { data: existing } = await supabase
+    const { data: existing } = await supabaseAdmin
       .from('delegues_congres')
       .select('id')
       .or(`email.eq.${email},telephone.eq.${telephone},nom_prenom.eq.${nom_prenom}`);
@@ -474,9 +474,9 @@ export async function submitInscriptionCongres(prevState: any, formData: FormDat
     const uploadFile = async (file: File, prefix: string) => {
       const ext = file.name.split('.').pop() || 'pdf';
       const fileName = `${prefix}-${Date.now()}-${Math.random().toString(36).substring(7)}.${ext}`;
-      const { data, error } = await supabase.storage.from('documents_congres').upload(fileName, file);
+      const { data, error } = await supabaseAdmin.storage.from('documents_congres').upload(fileName, file);
       if (error) throw error;
-      const { data: { publicUrl } } = supabase.storage.from('documents_congres').getPublicUrl(fileName);
+      const { data: { publicUrl } } = supabaseAdmin.storage.from('documents_congres').getPublicUrl(fileName);
       return publicUrl;
     };
 
@@ -498,7 +498,7 @@ export async function submitInscriptionCongres(prevState: any, formData: FormDat
       statut: 'en_attente'
     };
 
-    const { error } = await supabase.from('delegues_congres').insert([data]);
+    const { error } = await supabaseAdmin.from('delegues_congres').insert([data]);
     if (error) throw error;
 
     // Pas d'email automatique, il sera envoyé après validation de l'admin.
