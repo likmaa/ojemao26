@@ -25,6 +25,7 @@ export default async function Home() {
             <Image src="https://flagcdn.com/w160/bj.png" alt="Bénin" width={60} height={40} style={styles.flag} />
             <Image src="https://flagcdn.com/w160/bf.png" alt="Burkina Faso" width={60} height={40} style={styles.flag} />
             <Image src="https://flagcdn.com/w160/ci.png" alt="Côte d'Ivoire" width={60} height={40} style={styles.flag} />
+            <Image src="https://flagcdn.com/w160/gn.png" alt="Guinée" width={60} height={40} style={styles.flag} />
             <Image src="https://flagcdn.com/w160/ml.png" alt="Mali" width={60} height={40} style={styles.flag} />
             <Image src="https://flagcdn.com/w160/ne.png" alt="Niger" width={60} height={40} style={styles.flag} />
             <Image src="https://flagcdn.com/w160/tg.png" alt="Togo" width={60} height={40} style={styles.flag} />
