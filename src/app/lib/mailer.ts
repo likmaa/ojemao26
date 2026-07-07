@@ -9,6 +9,22 @@ interface SendConfirmationEmailParams {
   details: any;
 }
 
+interface SendFocalPointNotificationParams {
+  focalPointEmail: string;
+  focalPointName: string;
+  country: string;
+  participant: {
+    nom: string;
+    email: string;
+    telephone?: string;
+    whatsapp?: string;
+    ville_pays?: string;
+    statut?: string;
+    organisation?: string;
+  };
+  eventName: string;
+}
+
 export async function sendConfirmationEmail({ to, nom, eventName, details }: SendConfirmationEmailParams) {
   if (!process.env.RESEND_API_KEY) {
     console.warn('RESEND_API_KEY non configurée. Email non envoyé à', to);
@@ -133,6 +149,103 @@ export async function sendConfirmationEmail({ to, nom, eventName, details }: Sen
     return { success: true, data };
   } catch (error) {
     console.error('Exception in sendConfirmationEmail:', error);
+    return { success: false, error };
+  }
+}
+
+export async function sendFocalPointNotification({
+  focalPointEmail,
+  focalPointName,
+  country,
+  participant,
+  eventName,
+}: SendFocalPointNotificationParams) {
+  if (!process.env.RESEND_API_KEY) {
+    console.warn('RESEND_API_KEY non configurée. Notification point focal non envoyée.');
+    return { success: false, error: 'API Key missing' };
+  }
+
+  try {
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <style>
+          body { font-family: 'Inter', sans-serif; line-height: 1.6; color: #1E293B; background-color: #F8FAFC; padding: 20px; }
+          .container { max-width: 600px; margin: 0 auto; background: #FFFFFF; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+          .header { background-color: #034389; padding: 30px 20px; text-align: center; color: white; }
+          .header h1 { margin: 0; font-size: 22px; font-weight: 700; }
+          .header p { margin: 8px 0 0; opacity: 0.85; font-size: 14px; }
+          .content { padding: 30px; }
+          .info-card { background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 20px; margin: 20px 0; }
+          .info-row { display: flex; padding: 6px 0; border-bottom: 1px solid #F1F5F9; }
+          .info-label { font-weight: 600; color: #475569; min-width: 160px; font-size: 0.9rem; }
+          .info-value { color: #1E293B; font-size: 0.9rem; }
+          .footer { background-color: #F1F5F9; padding: 20px; text-align: center; font-size: 12px; color: #64748B; }
+          .badge { display: inline-block; background: rgba(3,67,137,0.1); color: #034389; border: 1px solid rgba(3,67,137,0.2); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; margin-bottom: 16px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>🔔 Nouvelle Inscription — ${eventName}</h1>
+            <p>Un participant de votre pays vient de s'inscrire</p>
+          </div>
+          <div class="content">
+            <span class="badge">Point Focal — ${country}</span>
+            <p>Bonjour <strong>${focalPointName}</strong>,</p>
+            <p>
+              Un participant de votre délégation (<strong>${country}</strong>) vient de s'inscrire à l'événement <strong>${eventName}</strong>.
+              Voici ses coordonnées :
+            </p>
+            <div class="info-card">
+              <div class="info-row">
+                <span class="info-label">Nom & Prénom</span>
+                <span class="info-value">${participant.nom}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Email</span>
+                <span class="info-value"><a href="mailto:${participant.email}">${participant.email}</a></span>
+              </div>
+              ${participant.telephone ? `<div class="info-row"><span class="info-label">Téléphone</span><span class="info-value">${participant.telephone}</span></div>` : ''}
+              ${participant.whatsapp ? `<div class="info-row"><span class="info-label">WhatsApp</span><span class="info-value">${participant.whatsapp}</span></div>` : ''}
+              ${participant.ville_pays ? `<div class="info-row"><span class="info-label">Ville / Pays</span><span class="info-value">${participant.ville_pays}</span></div>` : ''}
+              ${participant.statut ? `<div class="info-row"><span class="info-label">Statut / Profil</span><span class="info-value">${participant.statut}</span></div>` : ''}
+              ${participant.organisation ? `<div class="info-row"><span class="info-label">Organisation</span><span class="info-value">${participant.organisation}</span></div>` : ''}
+            </div>
+            <p>
+              Veuillez noter cette inscription et prendre contact si nécessaire pour coordonner la délégation de votre pays.
+            </p>
+            <p style="margin-top: 30px;">
+              Le Comité d'Organisation OJEMAO<br/>
+              <a href="https://ojemao26.com">ojemao26.com</a>
+            </p>
+          </div>
+          <div class="footer">
+            Cet email vous est envoyé en tant que Point Focal officiel pour <strong>${country}</strong>.<br/>
+            © 2026 OJEMAO - Tous droits réservés.
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    const { data, error } = await resend.emails.send({
+      from: 'OJEMAO 2026 <inscription@ojemao26.logtech.tech>',
+      to: [focalPointEmail],
+      subject: `[Notification] Nouvelle inscription ${country} — ${eventName}`,
+      html: htmlContent,
+    });
+
+    if (error) {
+      console.error('Error sending focal point notification:', error);
+      return { success: false, error };
+    }
+
+    return { success: true, data };
+  } catch (error) {
+    console.error('Exception in sendFocalPointNotification:', error);
     return { success: false, error };
   }
 }

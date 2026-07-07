@@ -24,6 +24,7 @@ type FocalPoint = {
   name: string;
   phone: string;
   wa: string;
+  email?: string;
 };
 
 export default function InfosAdminPage() {
@@ -41,7 +42,7 @@ export default function InfosAdminPage() {
   const [contactForm, setContactForm] = useState({ id: '', label: '', value: '', icon_type: 'phone' });
 
   // Form states for focal points
-  const [focalForm, setFocalForm] = useState({ id: '', country: '', flag: '', name: '', phone: '', wa: '' });
+  const [focalForm, setFocalForm] = useState({ id: '', country: '', flag: '', name: '', phone: '', wa: '', email: '' });
 
   useEffect(() => {
     fetchData();
@@ -127,7 +128,8 @@ export default function InfosAdminPage() {
         flag: focalForm.flag,
         name: focalForm.name,
         phone: focalForm.phone,
-        wa: focalForm.wa
+        wa: focalForm.wa,
+        email: focalForm.email || null,
       }).eq('id', focalForm.id);
       if (error) alert("Erreur lors de la modification : " + error.message);
     } else {
@@ -136,11 +138,12 @@ export default function InfosAdminPage() {
         flag: focalForm.flag,
         name: focalForm.name,
         phone: focalForm.phone,
-        wa: focalForm.wa
+        wa: focalForm.wa,
+        email: focalForm.email || null,
       }]);
       if (error) alert("Erreur lors de l'ajout : " + error.message);
     }
-    setFocalForm({ id: '', country: '', flag: '', name: '', phone: '', wa: '' });
+    setFocalForm({ id: '', country: '', flag: '', name: '', phone: '', wa: '', email: '' });
     fetchData();
   };
 
@@ -311,9 +314,13 @@ export default function InfosAdminPage() {
                       <label style={styles.label}>WhatsApp (Sans '+' ni espaces)</label>
                       <input type="text" value={focalForm.wa} onChange={(e) => setFocalForm({...focalForm, wa: e.target.value})} style={styles.input} required placeholder="Ex: 22997123456" />
                     </div>
+                    <div style={styles.inputGroup}>
+                      <label style={styles.label}>Email du Point Focal (pour notifications automatiques)</label>
+                      <input type="email" value={focalForm.email} onChange={(e) => setFocalForm({...focalForm, email: e.target.value})} style={styles.input} placeholder="Ex: focal@association.com" />
+                    </div>
                     <div style={styles.formActions}>
                       {focalForm.id && (
-                        <button type="button" onClick={() => setFocalForm({ id: '', country: '', flag: '', name: '', phone: '', wa: '' })} style={styles.cancelBtn}>Annuler</button>
+                        <button type="button" onClick={() => setFocalForm({ id: '', country: '', flag: '', name: '', phone: '', wa: '', email: '' })} style={styles.cancelBtn}>Annuler</button>
                       )}
                       <button type="submit" style={styles.submitBtn}>Enregistrer</button>
                     </div>
@@ -331,10 +338,13 @@ export default function InfosAdminPage() {
                         <p style={styles.cardText}>
                           Représentant : <strong>{fp.name}</strong><br />
                           Tél : <span style={{color: 'var(--primary)'}}>{fp.phone}</span><br />
-                          WhatsApp payload : <span style={{color: 'var(--accent)', fontSize: '0.85rem'}}>{fp.wa}</span>
+                          WhatsApp payload : <span style={{color: 'var(--accent)', fontSize: '0.85rem'}}>{fp.wa}</span><br />
+                          {fp.email && <>
+                            Email : <span style={{color: '#6366f1', fontSize: '0.85rem'}}>{fp.email}</span> <span style={{background:'rgba(99,102,241,0.1)',color:'#6366f1',padding:'1px 6px',borderRadius:'20px',fontSize:'0.75rem',fontWeight:'700'}}>✉ Notifs ON</span>
+                          </>}
                         </p>
                         <div style={styles.cardActions}>
-                          <button onClick={() => setFocalForm(fp)} style={styles.editBtn}>✏️ Modifier</button>
+                          <button onClick={() => setFocalForm({...fp, email: fp.email || ''})} style={styles.editBtn}>✏️ Modifier</button>
                           <button onClick={() => handleDeleteFocal(fp.id)} style={styles.deleteBtn}>🗑️ Supprimer</button>
                         </div>
                       </div>

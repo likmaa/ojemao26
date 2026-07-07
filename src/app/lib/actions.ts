@@ -5,7 +5,7 @@ import { InscriptionDebatInput, InscriptionCifInput, InscriptionDelegueInput } f
 import fs from 'fs/promises';
 import path from 'path';
 import { cookies } from 'next/headers';
-import { sendConfirmationEmail } from './mailer';
+import { sendConfirmationEmail, sendFocalPointNotification } from './mailer';
 
 // Admin Authentication Action
 export async function authenticateAdmin(prevState: any, formData: FormData) {
@@ -193,13 +193,39 @@ export async function submitInscriptionDebat(prevState: any, formData: FormData)
       
       const insertedRow = insertedData[0];
 
-      // Envoi de l'email
+      // Envoi de l'email de confirmation au participant
       await sendConfirmationEmail({
         to: email,
         nom: nom_prenom,
         eventName: 'Débat de Cotonou',
         details: { ...data, id: insertedRow.id }
       });
+
+      // Notification du point focal du pays de l'inscrit (silencieux, n'interrompt pas l'inscription)
+      try {
+        const countryKeywords = ville_pays.split(',').map((s: string) => s.trim()).filter(Boolean);
+        const countryName = countryKeywords[countryKeywords.length - 1]; // Dernière partie = pays
+        if (countryName) {
+          const { data: focalPoints } = await supabase
+            .from('focal_points')
+            .select('name, email, country')
+            .not('email', 'is', null)
+            .ilike('country', `%${countryName}%`)
+            .limit(1);
+          if (focalPoints && focalPoints.length > 0 && focalPoints[0].email) {
+            const fp = focalPoints[0];
+            await sendFocalPointNotification({
+              focalPointEmail: fp.email,
+              focalPointName: fp.name,
+              country: fp.country,
+              participant: { nom: nom_prenom, email, telephone, ville_pays, statut: type_participant, organisation },
+              eventName: 'Débat de Cotonou',
+            });
+          }
+        }
+      } catch (fpError) {
+        console.warn('Notification point focal échouée (non bloquante):', fpError);
+      }
 
       // Auto-inscription au CIF si demandé
       if (participer_cif === 'oui') {
@@ -339,6 +365,32 @@ export async function submitInscriptionCif(prevState: any, formData: FormData) {
         eventName: 'Colloque International de Formation (CIF)',
         details: { ...data, id: insertedRow.id }
       });
+
+      // Notification du point focal du pays de l'inscrit (silencieux)
+      try {
+        const countryKeywords = ville_pays.split(',').map((s: string) => s.trim()).filter(Boolean);
+        const countryName = countryKeywords[countryKeywords.length - 1];
+        if (countryName) {
+          const { data: focalPoints } = await supabase
+            .from('focal_points')
+            .select('name, email, country')
+            .not('email', 'is', null)
+            .ilike('country', `%${countryName}%`)
+            .limit(1);
+          if (focalPoints && focalPoints.length > 0 && focalPoints[0].email) {
+            const fp = focalPoints[0];
+            await sendFocalPointNotification({
+              focalPointEmail: fp.email,
+              focalPointName: fp.name,
+              country: fp.country,
+              participant: { nom: nom_prenom, email, whatsapp, ville_pays, statut, organisation: etablissement },
+              eventName: 'Colloque International de Formation (CIF)',
+            });
+          }
+        }
+      } catch (fpError) {
+        console.warn('Notification point focal CIF échouée (non bloquante):', fpError);
+      }
 
       return { success: true, message: 'Votre inscription au CIF a été enregistrée avec succès !' };
     } catch (error: any) {
