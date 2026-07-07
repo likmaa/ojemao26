@@ -14,6 +14,7 @@ const focalPoints = [
   { flag: '🇧🇫', country: 'Burkina Faso', name: 'Moussa Sawadogo', phone: '+226 70 12 34 56', wa: '22670123456' },
   { flag: '🇸🇳', country: 'Sénégal', name: 'Cheikh Diallo', phone: '+221 77 123 45 67', wa: '221771234567' },
   { flag: '🇬🇳', country: 'Guinée', name: 'Mamadou Barry', phone: '+224 620 12 34 56', wa: '224620123456' },
+  { flag: '🇬🇼', country: 'Guinée-Bissau', name: 'Sana Canté', phone: '+245 95 123 45 67', wa: '245951234567' },
 ];
 
 export default async function DebatPage() {
