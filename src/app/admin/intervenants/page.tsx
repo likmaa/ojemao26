@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/app/lib/supabase';
+import { adminDeleteSpeaker } from '@/app/lib/admin-actions';
 import { FaPlus, FaEdit, FaTrash, FaSpinner } from 'react-icons/fa';
 import Image from 'next/image';
+
 
 interface Speaker {
   id: string;
@@ -108,27 +110,20 @@ export default function AdminIntervenants() {
     e.preventDefault();
     setLoading(true);
 
-    if (editingSpeaker) {
-      // Update
-      const { error } = await supabase
-        .from('speakers')
-        .update(formData)
-        .eq('id', editingSpeaker.id);
-        
-      if (error) {
-        alert('Erreur lors de la modification.');
-        console.error(error);
-      }
-    } else {
-      // Insert
-      const { error } = await supabase
-        .from('speakers')
-        .insert([formData]);
-        
-      if (error) {
-        alert('Erreur lors de l\'ajout.');
-        console.error(error);
-      }
+    // Appel Server Action (supabaseAdmin) pour INSERT ou UPDATE
+    const { adminSaveSpeaker } = await import('@/app/lib/admin-actions');
+    const result = await adminSaveSpeaker({
+      id: editingSpeaker?.id || undefined,
+      nom: formData.name,
+      titre: formData.title,
+      bio: formData.role,
+      photo_url: formData.image_url || undefined,
+      pays: formData.category,
+    });
+
+    if (result?.error) {
+      alert('Erreur lors de l\'enregistrement : ' + result.error);
+      console.error(result.error);
     }
 
     handleCloseModal();
@@ -137,9 +132,9 @@ export default function AdminIntervenants() {
 
   const handleDelete = async (id: string) => {
     if (confirm('Êtes-vous sûr de vouloir supprimer cet intervenant ?')) {
-      const { error } = await supabase.from('speakers').delete().eq('id', id);
-      if (error) {
-        alert('Erreur lors de la suppression.');
+      const result = await adminDeleteSpeaker(id);
+      if (result?.error) {
+        alert('Erreur lors de la suppression : ' + result.error);
       } else {
         fetchSpeakers();
       }

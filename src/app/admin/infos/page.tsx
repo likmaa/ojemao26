@@ -2,6 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/app/lib/supabase';
+import {
+  adminSaveAccommodation, adminDeleteAccommodation,
+  adminSaveContact, adminDeleteContact,
+  adminSaveFocalPoint, adminDeleteFocalPoint,
+} from '@/app/lib/admin-actions';
 
 type Accommodation = {
   id: string;
@@ -64,93 +69,66 @@ export default function InfosAdminPage() {
 
   const handleSaveHotel = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (hotelForm.id) {
-      const { error } = await supabase.from('accommodations').update({
-        name: hotelForm.name,
-        description: hotelForm.description,
-        distance: hotelForm.distance
-      }).eq('id', hotelForm.id);
-      if (error) alert("Erreur lors de la modification : " + error.message);
-    } else {
-      const { error } = await supabase.from('accommodations').insert([{
-        name: hotelForm.name,
-        description: hotelForm.description,
-        distance: hotelForm.distance
-      }]);
-      if (error) alert("Erreur lors de l'ajout : " + error.message);
-    }
+    const result = await adminSaveAccommodation({
+      id: hotelForm.id || undefined,
+      name: hotelForm.name,
+      description: hotelForm.description,
+      distance: hotelForm.distance,
+    });
+    if (result?.error) alert("Erreur lors de l'enregistrement : " + result.error);
     setHotelForm({ id: '', name: '', description: '', distance: '' });
     fetchData();
   };
 
   const handleDeleteHotel = async (id: string) => {
     if (confirm('Supprimer cet hébergement ?')) {
-      const { error } = await supabase.from('accommodations').delete().eq('id', id);
-      if (error) alert("Erreur lors de la suppression : " + error.message);
+      const result = await adminDeleteAccommodation(id);
+      if (result?.error) alert("Erreur lors de la suppression : " + result.error);
       fetchData();
     }
   };
 
   const handleSaveContact = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (contactForm.id) {
-      const { error } = await supabase.from('contacts').update({
-        label: contactForm.label,
-        value: contactForm.value,
-        icon_type: contactForm.icon_type
-      }).eq('id', contactForm.id);
-      if (error) alert("Erreur lors de la modification : " + error.message);
-    } else {
-      const { error } = await supabase.from('contacts').insert([{
-        label: contactForm.label,
-        value: contactForm.value,
-        icon_type: contactForm.icon_type
-      }]);
-      if (error) alert("Erreur lors de l'ajout : " + error.message);
-    }
+    const result = await adminSaveContact({
+      id: contactForm.id || undefined,
+      label: contactForm.label,
+      value: contactForm.value,
+      icon_type: contactForm.icon_type,
+    });
+    if (result?.error) alert("Erreur lors de l'enregistrement : " + result.error);
     setContactForm({ id: '', label: '', value: '', icon_type: 'phone' });
     fetchData();
   };
 
   const handleDeleteContact = async (id: string) => {
     if (confirm('Supprimer ce contact ?')) {
-      const { error } = await supabase.from('contacts').delete().eq('id', id);
-      if (error) alert("Erreur lors de la suppression : " + error.message);
+      const result = await adminDeleteContact(id);
+      if (result?.error) alert("Erreur lors de la suppression : " + result.error);
       fetchData();
     }
   };
 
   const handleSaveFocal = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (focalForm.id) {
-      const { error } = await supabase.from('focal_points').update({
-        country: focalForm.country,
-        flag: focalForm.flag,
-        name: focalForm.name,
-        phone: focalForm.phone,
-        wa: focalForm.wa,
-        email: focalForm.email || null,
-      }).eq('id', focalForm.id);
-      if (error) alert("Erreur lors de la modification : " + error.message);
-    } else {
-      const { error } = await supabase.from('focal_points').insert([{
-        country: focalForm.country,
-        flag: focalForm.flag,
-        name: focalForm.name,
-        phone: focalForm.phone,
-        wa: focalForm.wa,
-        email: focalForm.email || null,
-      }]);
-      if (error) alert("Erreur lors de l'ajout : " + error.message);
-    }
+    const result = await adminSaveFocalPoint({
+      id: focalForm.id || undefined,
+      country: focalForm.country,
+      flag: focalForm.flag,
+      name: focalForm.name,
+      phone: focalForm.phone,
+      wa: focalForm.wa,
+      email: focalForm.email || undefined,
+    });
+    if (result?.error) alert("Erreur lors de l'enregistrement : " + result.error);
     setFocalForm({ id: '', country: '', flag: '', name: '', phone: '', wa: '', email: '' });
     fetchData();
   };
 
   const handleDeleteFocal = async (id: string) => {
     if (confirm('Supprimer ce point focal ?')) {
-      const { error } = await supabase.from('focal_points').delete().eq('id', id);
-      if (error) alert("Erreur lors de la suppression : " + error.message);
+      const result = await adminDeleteFocalPoint(id);
+      if (result?.error) alert("Erreur lors de la suppression : " + result.error);
       fetchData();
     }
   };

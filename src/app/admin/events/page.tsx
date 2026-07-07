@@ -40,27 +40,32 @@ export default function AdminEvents() {
       const fileExt = file.name.split('.').pop();
       const fileName = `${eventType}_${Date.now()}.${fileExt}`;
 
-      const { error: uploadError } = await supabase.storage
+      // Upload via supabaseAdmin (bypass RLS sur le storage)
+      const { adminSaveEvent } = await import('@/app/lib/admin-actions');
+      const { supabaseAdmin } = await import('@/app/lib/supabase');
+
+      const { error: uploadError } = await supabaseAdmin.storage
         .from('speakers')
         .upload(fileName, file);
 
       if (uploadError) throw uploadError;
 
-      const { data } = supabase.storage.from('speakers').getPublicUrl(fileName);
+      const { data } = supabaseAdmin.storage.from('speakers').getPublicUrl(fileName);
       const newUrl = data.publicUrl;
-      
+
+      // Lecture pour trouver l'id existant (anon OK pour SELECT)
       const { data: existing, error: selectError } = await supabase.from('events').select('id').eq('title', eventType).maybeSingle();
       if (selectError) throw selectError;
-      
-      if (existing) {
-        const { error: updateError } = await supabase.from('events').update({ image_url: newUrl }).eq('id', existing.id);
-        if (updateError) throw updateError;
-      } else {
-        const { error: insertError } = await supabase.from('events').insert([
-          { title: eventType, image_url: newUrl, date_badge: '', description: '', link_url: '' }
-        ]);
-        if (insertError) throw insertError;
-      }
+
+      // Écriture via adminSaveEvent (service_role)
+      await adminSaveEvent({
+        id: existing?.id,
+        title: eventType,
+        image_url: newUrl,
+        date_badge: '',
+        description: '',
+        link_url: '',
+      });
 
       if (eventType === 'debat') setDebatPreview(newUrl);
       if (eventType === 'cif') setCifPreview(newUrl);
