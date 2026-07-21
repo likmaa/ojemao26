@@ -36,13 +36,14 @@ export default function AdminLogin() {
     startTransition(async () => {
       const res = await authenticateWithRole(username, password);
       if (res?.success) {
-        if (res.role === 'hebergement') router.push('/admin/hebergement');
+        if (res.role === 'hebergement') router.push('/admin/inscriptions');
         else router.push('/admin');
       } else {
         setError(res?.error || 'Identifiants incorrects.');
       }
     });
   };
+
 
   return (
     <div style={styles.container} className="animate-fade-in">

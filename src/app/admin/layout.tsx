@@ -3,8 +3,9 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { FaTachometerAlt, FaUsers, FaMicrophone, FaBars, FaTimes, FaSignOutAlt, FaInfoCircle, FaCalendarAlt, FaCog, FaBed, FaArrowLeft } from 'react-icons/fa';
+import { FaTachometerAlt, FaUsers, FaMicrophone, FaBars, FaTimes, FaSignOutAlt, FaInfoCircle, FaCalendarAlt, FaCog, FaArrowLeft } from 'react-icons/fa';
 import { logoutAdmin } from '@/app/lib/actions';
+
 
 
 
@@ -40,8 +41,8 @@ export default function AdminLayout({
     { name: 'Inscriptions', href: '/admin/inscriptions', icon: <FaUsers />, roles: ['admin', 'hebergement'] },
     { name: 'Intervenants', href: '/admin/intervenants', icon: <FaMicrophone />, roles: ['admin'] },
     { name: 'Infos Pratiques', href: '/admin/infos', icon: <FaInfoCircle />, roles: ['admin'] },
-    { name: 'Hébergement', href: '/admin/hebergement', icon: <FaBed />, roles: ['admin', 'hebergement'] },
   ];
+
 
   const navItems = allNavItems.filter(item => item.roles.includes(userRole));
 

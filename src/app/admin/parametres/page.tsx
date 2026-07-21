@@ -74,8 +74,9 @@ export default function ParametresPage() {
           <div style={s.roleCard}>
             <span style={{ fontSize: '2rem' }}>🛏️</span>
             <strong style={{ color: '#0EA5E9', display: 'block', margin: '0.5rem 0 0.25rem' }}>Hébergement</strong>
-            <p style={s.roleDesc}>Accès restreint : liste CIF et délégués avec dates d'arrivée/départ et besoins d'hébergement uniquement.</p>
+            <p style={s.roleDesc}>Accès restreint : vue en lecture seule de la liste de <b>toutes les inscriptions</b>. Aucune action de modification autorisée.</p>
           </div>
+
         </div>
       </div>
 
@@ -135,15 +136,16 @@ export default function ParametresPage() {
                 <strong style={{ color: ROLES[form.role].color, fontSize: '0.85rem' }}>Accès de ce rôle :</strong>
                 <ul style={{ margin:'0.4rem 0 0', paddingLeft:'1.2rem', fontSize:'0.82rem', color:'#475569', lineHeight:'1.6' }}>
                   {form.role === 'admin' ? (<>
-                    <li>✅ Toutes les inscriptions (Débat, CIF, Délégués)</li>
+                    <li>✅ Toutes les inscriptions (Débat, CIF, Délégués) avec droit de modification</li>
                     <li>✅ Intervenants, Événements, Infos pratiques</li>
                     <li>✅ Paramètres et gestion des utilisateurs</li>
                   </>) : (<>
-                    <li>✅ Liste CIF avec dates et besoins hébergement</li>
-                    <li>✅ Liste délégués avec infos logistiques</li>
+                    <li>✅ Accès en lecture seule à TOUTES les inscriptions</li>
+                    <li>❌ Aucune action (suppression/modification) autorisée</li>
                     <li>❌ Pas d'accès aux autres sections</li>
                   </>)}
                 </ul>
+
               </div>
               <div style={s.actions}>
                 <button type="button" onClick={() => setShowModal(false)} style={s.cancelBtn}>Annuler</button>
