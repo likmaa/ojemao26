@@ -27,7 +27,7 @@ export default function AdminLayout({
   const allNavItems = [
     { name: 'Tableau de bord', href: '/admin', icon: <FaTachometerAlt />, roles: ['admin'] },
     { name: 'Événements', href: '/admin/events', icon: <FaCalendarAlt />, roles: ['admin'] },
-    { name: 'Inscriptions', href: '/admin/inscriptions', icon: <FaUsers />, roles: ['admin'] },
+    { name: 'Inscriptions', href: '/admin/inscriptions', icon: <FaUsers />, roles: ['admin', 'hebergement'] },
     { name: 'Intervenants', href: '/admin/intervenants', icon: <FaMicrophone />, roles: ['admin'] },
     { name: 'Infos Pratiques', href: '/admin/infos', icon: <FaInfoCircle />, roles: ['admin'] },
     { name: 'Hébergement', href: '/admin/hebergement', icon: <FaBed />, roles: ['admin', 'hebergement'] },

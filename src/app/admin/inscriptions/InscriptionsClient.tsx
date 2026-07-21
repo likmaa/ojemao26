@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import AdminActionButtons from './AdminActionButtons';
+
 
 interface InscriptionsClientProps {
   debatData: any[];
@@ -21,6 +22,13 @@ const formatDate = (isoString: string) => {
 
 export default function InscriptionsClient({ debatData, cifData, deleguesData }: InscriptionsClientProps) {
   const [activeTab, setActiveTab] = useState<ActiveTab>('debat');
+  const [readOnly, setReadOnly] = useState(false);
+
+  useEffect(() => {
+    // Mode lecture seule si rôle hébergement
+    const match = document.cookie.match(/admin_role=([^;]+)/);
+    if (match && match[1] === 'hebergement') setReadOnly(true);
+  }, []);
 
   // ─── DEBAT FILTERS ───────────────────────────────────────────
   const [debatSearch, setDebatSearch] = useState('');
@@ -158,7 +166,7 @@ export default function InscriptionsClient({ debatData, cifData, deleguesData }:
             <table style={s.table}>
               <thead>
                 <tr>
-                  {['Date', 'N° Place', 'Nom & Prénom', 'Genre', 'Type', 'Organisation', 'Pays/Ville', 'Contact', 'Actions'].map(h => (
+                  {['Date', 'N° Place', 'Nom & Prénom', 'Genre', 'Type', 'Organisation', 'Pays/Ville', 'Contact', ...(!readOnly ? ['Actions'] : [])].map(h => (
                     <th key={h} style={s.th}>{h}</th>
                   ))}
                 </tr>
@@ -179,9 +187,9 @@ export default function InscriptionsClient({ debatData, cifData, deleguesData }:
                       <div>{row.telephone}</div>
                       <div style={{fontSize:'0.8rem',color:'#94A3B8'}}>{row.email}</div>
                     </td>
-                    <td style={s.td}><AdminActionButtons id={row.id} table="inscriptions_debat" data={row} /></td>
+                    {!readOnly && <td style={s.td}><AdminActionButtons id={row.id} table="inscriptions_debat" data={row} /></td>}
                   </tr>
-                )) : <EmptyRow cols={9} />}
+                )) : <EmptyRow cols={readOnly ? 8 : 9} />}
               </tbody>
             </table>
           </div>
@@ -205,7 +213,7 @@ export default function InscriptionsClient({ debatData, cifData, deleguesData }:
             <table style={s.table}>
               <thead>
                 <tr>
-                  {['Date', 'Nom & Prénom', 'Statut', 'Pays/Ville', 'Âge', 'Déplacement', 'Arrivée → Départ', 'Contact', 'Actions'].map(h => (
+                  {['Date', 'Nom & Prénom', 'Statut', 'Pays/Ville', 'Âge', 'Déplacement', 'Arrivée → Départ', 'Contact', ...(!readOnly ? ['Actions'] : [])].map(h => (
                     <th key={h} style={s.th}>{h}</th>
                   ))}
                 </tr>
@@ -224,14 +232,14 @@ export default function InscriptionsClient({ debatData, cifData, deleguesData }:
                     <td style={s.td}>{row.ville_pays}</td>
                     <td style={s.td}>{row.tranche_age}</td>
                     <td style={s.td}><strong>{row.moyen_deplacement}</strong></td>
-                    <td style={s.td} ><span style={{fontSize:'0.85rem'}}>{row.date_arrivee} → {row.date_depart}</span></td>
+                    <td style={s.td}><span style={{fontSize:'0.85rem'}}>{row.date_arrivee} → {row.date_depart}</span></td>
                     <td style={s.td}>
                       <div>{row.whatsapp}</div>
                       <div style={{fontSize:'0.8rem',color:'#94A3B8'}}>{row.email}</div>
                     </td>
-                    <td style={s.td}><AdminActionButtons id={row.id} table="inscriptions_cif" data={row} currentStatus={row.statut} /></td>
+                    {!readOnly && <td style={s.td}><AdminActionButtons id={row.id} table="inscriptions_cif" data={row} currentStatus={row.statut} /></td>}
                   </tr>
-                )) : <EmptyRow cols={9} />}
+                )) : <EmptyRow cols={readOnly ? 8 : 9} />}
               </tbody>
             </table>
           </div>
@@ -254,7 +262,7 @@ export default function InscriptionsClient({ debatData, cifData, deleguesData }:
             <table style={s.table}>
               <thead>
                 <tr>
-                  {['Date', 'Nom & Prénom', 'Structure', 'Pays', 'Mandat', 'Délégués', 'Contact', 'Statut', 'Actions'].map(h => (
+                  {['Date', 'Nom & Prénom', 'Structure', 'Pays', 'Mandat', 'Délégués', 'Contact', 'Statut', ...(!readOnly ? ['Actions'] : [])].map(h => (
                     <th key={h} style={s.th}>{h}</th>
                   ))}
                 </tr>
@@ -280,9 +288,9 @@ export default function InscriptionsClient({ debatData, cifData, deleguesData }:
                         {row.statut === 'valide' ? '✓ Validé' : row.statut === 'rejete' ? '✗ Rejeté' : '⏳ En attente'}
                       </span>
                     </td>
-                    <td style={s.td}><AdminActionButtons id={row.id} table="delegues_congres" data={row} currentStatus={row.statut} /></td>
+                    {!readOnly && <td style={s.td}><AdminActionButtons id={row.id} table="delegues_congres" data={row} currentStatus={row.statut} /></td>}
                   </tr>
-                )) : <EmptyRow cols={9} />}
+                )) : <EmptyRow cols={readOnly ? 8 : 9} />}
               </tbody>
             </table>
           </div>
