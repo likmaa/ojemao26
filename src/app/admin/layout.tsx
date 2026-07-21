@@ -2,8 +2,9 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
-import { FaTachometerAlt, FaUsers, FaMicrophone, FaBars, FaTimes, FaSignOutAlt, FaInfoCircle, FaCalendarAlt } from 'react-icons/fa';
+import { useState, useEffect } from 'react';
+import { FaTachometerAlt, FaUsers, FaMicrophone, FaBars, FaTimes, FaSignOutAlt, FaInfoCircle, FaCalendarAlt, FaCog, FaBed } from 'react-icons/fa';
+
 
 export default function AdminLayout({
   children,
@@ -12,17 +13,28 @@ export default function AdminLayout({
 }) {
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [userRole, setUserRole] = useState<string>('admin');
+
+  useEffect(() => {
+    // Lire le rôle depuis le cookie côté client
+    const match = document.cookie.match(/admin_role=([^;]+)/);
+    if (match) setUserRole(match[1]);
+  }, []);
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
   const closeSidebar = () => setIsSidebarOpen(false);
 
-  const navItems = [
-    { name: 'Tableau de bord', href: '/admin', icon: <FaTachometerAlt /> },
-    { name: 'Événements', href: '/admin/events', icon: <FaCalendarAlt /> },
-    { name: 'Inscriptions', href: '/admin/inscriptions', icon: <FaUsers /> },
-    { name: 'Intervenants', href: '/admin/intervenants', icon: <FaMicrophone /> },
-    { name: 'Infos Pratiques', href: '/admin/infos', icon: <FaInfoCircle /> },
+  const allNavItems = [
+    { name: 'Tableau de bord', href: '/admin', icon: <FaTachometerAlt />, roles: ['admin'] },
+    { name: 'Événements', href: '/admin/events', icon: <FaCalendarAlt />, roles: ['admin'] },
+    { name: 'Inscriptions', href: '/admin/inscriptions', icon: <FaUsers />, roles: ['admin'] },
+    { name: 'Intervenants', href: '/admin/intervenants', icon: <FaMicrophone />, roles: ['admin'] },
+    { name: 'Infos Pratiques', href: '/admin/infos', icon: <FaInfoCircle />, roles: ['admin'] },
+    { name: 'Hébergement', href: '/admin/hebergement', icon: <FaBed />, roles: ['admin', 'hebergement'] },
   ];
+
+  const navItems = allNavItems.filter(item => item.roles.includes(userRole));
+
 
   return (
     <div style={styles.layoutWrapper}>
@@ -75,6 +87,18 @@ export default function AdminLayout({
           </div>
 
           <div style={styles.navBottom}>
+            {userRole === 'admin' && (
+              <Link href="/admin/parametres" onClick={closeSidebar} style={{
+                ...styles.navLink,
+                backgroundColor: pathname === '/admin/parametres' ? 'rgba(99,102,241,0.1)' : 'transparent',
+                color: pathname === '/admin/parametres' ? '#6366F1' : '#475569',
+                borderRight: pathname === '/admin/parametres' ? '3px solid #6366F1' : '3px solid transparent',
+                fontWeight: pathname === '/admin/parametres' ? '700' : '500',
+              }}>
+                <span style={{ ...styles.icon, color: pathname === '/admin/parametres' ? '#6366F1' : '#94A3B8' }}><FaCog /></span>
+                Paramètres
+              </Link>
+            )}
             <Link href="/" style={styles.navLink} onClick={closeSidebar}>
               <span style={styles.icon}><FaSignOutAlt /></span>
               Retour au site

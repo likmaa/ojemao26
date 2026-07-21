@@ -243,3 +243,60 @@ export async function adminSaveEvent(data: { id?: string; [key: string]: any; })
   }
   return { success: true };
 }
+
+// ============================================================
+// GESTION DES UTILISATEURS ADMIN (Rôles)
+// ============================================================
+
+async function hashPassword(password: string): Promise<string> {
+  const { createHash } = await import('crypto');
+  return createHash('sha256').update(password + (process.env.ADMIN_PASSWORD || '') + 'ojemao_salt').digest('hex');
+}
+
+export async function createAdminUser(data: { username: string; password: string; role: 'admin' | 'hebergement' }) {
+  await checkAdminAuth();
+  const hash = await hashPassword(data.password);
+  const { error } = await supabaseAdmin.from('admin_users').insert([{
+    username: data.username.trim().toLowerCase(),
+    password_hash: hash,
+    role: data.role,
+  }]);
+  if (error) return { error: error.code === '23505' ? "Ce nom d'utilisateur existe déjà." : error.message };
+  return { success: true };
+}
+
+export async function updateAdminUser(data: { id: string; username: string; role: 'admin' | 'hebergement'; password?: string }) {
+  await checkAdminAuth();
+  const payload: Record<string, any> = { username: data.username.trim().toLowerCase(), role: data.role };
+  if (data.password) payload.password_hash = await hashPassword(data.password);
+  const { error } = await supabaseAdmin.from('admin_users').update(payload).eq('id', data.id);
+  if (error) return { error: error.code === '23505' ? "Ce nom d'utilisateur existe déjà." : error.message };
+  return { success: true };
+}
+
+export async function deleteAdminUser(id: string) {
+  await checkAdminAuth();
+  const { error } = await supabaseAdmin.from('admin_users').delete().eq('id', id);
+  if (error) return { error: error.message };
+  return { success: true };
+}
+
+export async function authenticateWithRole(username: string, password: string) {
+  const hash = await hashPassword(password);
+  const { data, error } = await supabase
+    .from('admin_users')
+    .select('id, username, role')
+    .eq('username', username.trim().toLowerCase())
+    .eq('password_hash', hash)
+    .single();
+
+  if (error || !data) return { success: false, error: 'Identifiants incorrects.' };
+
+  const cookieStore = await cookies();
+  const opts = { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'strict' as const, maxAge: 60 * 60 * 24 * 7 };
+  cookieStore.set('admin_authenticated', 'true', opts);
+  cookieStore.set('admin_role', data.role, opts);
+  cookieStore.set('admin_username', data.username, opts);
+
+  return { success: true, role: data.role };
+}
