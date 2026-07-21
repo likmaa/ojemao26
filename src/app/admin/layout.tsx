@@ -1,9 +1,11 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { FaTachometerAlt, FaUsers, FaMicrophone, FaBars, FaTimes, FaSignOutAlt, FaInfoCircle, FaCalendarAlt, FaCog, FaBed } from 'react-icons/fa';
+import { FaTachometerAlt, FaUsers, FaMicrophone, FaBars, FaTimes, FaSignOutAlt, FaInfoCircle, FaCalendarAlt, FaCog, FaBed, FaArrowLeft } from 'react-icons/fa';
+import { logoutAdmin } from '@/app/lib/actions';
+
 
 
 export default function AdminLayout({
@@ -12,8 +14,10 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [userRole, setUserRole] = useState<string>('admin');
+
 
   useEffect(() => {
     // Lire le rôle depuis le cookie côté client
@@ -23,6 +27,12 @@ export default function AdminLayout({
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
   const closeSidebar = () => setIsSidebarOpen(false);
+
+  const handleLogout = async () => {
+    await logoutAdmin();
+    router.push('/admin/login');
+  };
+
 
   const allNavItems = [
     { name: 'Tableau de bord', href: '/admin', icon: <FaTachometerAlt />, roles: ['admin'] },
@@ -99,11 +109,16 @@ export default function AdminLayout({
                 Paramètres
               </Link>
             )}
+            <button onClick={handleLogout} style={{ ...styles.navLink, width: '100%', textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', color: '#EF4444', fontWeight: '600' }}>
+              <span style={{ ...styles.icon, color: '#EF4444' }}><FaSignOutAlt /></span>
+              Déconnexion
+            </button>
             <Link href="/" style={styles.navLink} onClick={closeSidebar}>
-              <span style={styles.icon}><FaSignOutAlt /></span>
+              <span style={styles.icon}><FaArrowLeft /></span>
               Retour au site
             </Link>
           </div>
+
         </nav>
       </aside>
 

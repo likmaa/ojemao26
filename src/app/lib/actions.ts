@@ -26,7 +26,10 @@ export async function authenticateAdmin(prevState: any, formData: FormData) {
 }
 
 export async function logoutAdmin() {
-  (await cookies()).delete('admin_authenticated');
+  const cookieStore = await cookies();
+  cookieStore.delete('admin_authenticated');
+  cookieStore.delete('admin_role');
+  cookieStore.delete('admin_username');
 }
 
 // Local storage fallback helper
