@@ -16,6 +16,7 @@ export default function Header() {
     { href: '/', label: 'Accueil' },
     { href: '/evenement/debat', label: 'Le Débat' },
     { href: '/evenement/cif', label: 'Congrès & CIF' },
+    { href: '/j-y-serai', label: "Affiche J'y serai" },
     { href: '/programme', label: 'Programme' },
     { href: '/intervenants', label: 'Intervenants' },
     { href: '/partenaires', label: 'Partenaires' },

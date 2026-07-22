@@ -34,10 +34,11 @@ export default function Footer() {
 
           {/* Col 3: Resources */}
           <div style={styles.col}>
-            <h4 style={styles.colTitle}>Inscriptions</h4>
+            <h4 style={styles.colTitle}>Inscriptions & Outils</h4>
             <div style={styles.links}>
               <Link href="/inscription/debat" style={styles.link}>S'inscrire au Débat (Gratuit)</Link>
               <Link href="/inscription/cif" style={styles.link}>Réserver pour le CIF (Colloque)</Link>
+              <Link href="/j-y-serai" style={{ ...styles.link, color: '#38BDF8', fontWeight: 'bold' }}>Créer mon Affiche "J'y serai"</Link>
               <Link href="/partenaires" style={styles.link}>Devenir Partenaire</Link>
               <Link href="/contact" style={styles.link}>Infos & Hébergements</Link>
             </div>
