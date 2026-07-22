@@ -117,65 +117,21 @@ export default function GenerateurAffiche() {
     // Clear canvas
     ctx.clearRect(0, 0, W, H);
 
-    // 1. Draw User Photo inside a Parallelogram Frame with Soft Progressive Contours
+    // 1. Draw User Photo directly behind the Gabarit PNG (No shape mask)
     const targetX = selectedPreset.defaultPhotoX + photoOffsetX;
     const targetY = selectedPreset.defaultPhotoY + photoOffsetY;
-    
-    // Parallelogram Dimensions - Fitted with proportions and breathing room around head
-    const boxW = 380;
-    const boxH = 340;
-    const skew = 45; // Slant for Parallelogram
+    const boxW = 550;
+    const boxH = 550;
 
     if (userImage) {
-      const offCanvas = document.createElement('canvas');
-      offCanvas.width = W;
-      offCanvas.height = H;
-      const offCtx = offCanvas.getContext('2d');
+      const aspect = userImage.width / userImage.height;
+      let drawW = boxW * photoZoom;
+      let drawH = drawW / aspect;
 
-      if (offCtx) {
-        // Fit photo nicely without cropping head too tightly
-        const aspect = userImage.width / userImage.height;
-        let drawW = boxW * photoZoom * 0.95;
-        let drawH = drawW / aspect;
+      const drawX = targetX - drawW / 2;
+      const drawY = targetY - drawH / 2;
 
-        if (drawH < boxH * photoZoom * 0.95) {
-          drawH = boxH * photoZoom * 0.95;
-          drawW = drawH * aspect;
-        }
-
-        const drawX = targetX - drawW / 2;
-        const drawY = targetY - drawH / 2;
-
-        // Draw user photo onto offscreen canvas
-        offCtx.drawImage(userImage, drawX, drawY, drawW, drawH);
-
-        // Apply Parallelogram Mask
-        offCtx.globalCompositeOperation = 'destination-in';
-        
-        // Create Parallelogram Path
-        offCtx.beginPath();
-        offCtx.moveTo(targetX - boxW / 2 + skew, targetY - boxH / 2);
-        offCtx.lineTo(targetX + boxW / 2 + skew, targetY - boxH / 2);
-        offCtx.lineTo(targetX + boxW / 2 - skew, targetY + boxH / 2);
-        offCtx.lineTo(targetX - boxW / 2 - skew, targetY + boxH / 2);
-        offCtx.closePath();
-        
-        offCtx.fillStyle = '#000000';
-        offCtx.fill();
-
-        // Soft Radial Edge Feathering over the Parallelogram
-        const gradRadius = Math.max(boxW, boxH) * 0.65;
-        const maskGrad = offCtx.createRadialGradient(targetX, targetY, gradRadius * 0.5, targetX, targetY, gradRadius * 1.05);
-        maskGrad.addColorStop(0, 'rgba(0, 0, 0, 1)');
-        maskGrad.addColorStop(0.7, 'rgba(0, 0, 0, 0.85)');
-        maskGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-
-        offCtx.fillStyle = maskGrad;
-        offCtx.fill();
-
-        // Draw the Parallelogram Photo onto main canvas
-        ctx.drawImage(offCanvas, 0, 0);
-      }
+      ctx.drawImage(userImage, drawX, drawY, drawW, drawH);
     } else {
       ctx.fillStyle = '#CBD5E1';
       ctx.fillRect(0, 0, W, H);
