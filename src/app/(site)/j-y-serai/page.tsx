@@ -117,10 +117,14 @@ export default function GenerateurAffiche() {
     // Clear canvas
     ctx.clearRect(0, 0, W, H);
 
-    // 1. Draw User Photo with Progressive Feathered Contours (Fondu Radial Progressif)
+    // 1. Draw User Photo inside a Parallelogram Frame with Soft Progressive Contours
     const targetX = selectedPreset.defaultPhotoX + photoOffsetX;
     const targetY = selectedPreset.defaultPhotoY + photoOffsetY;
-    const radius = selectedPreset.defaultPhotoRadius;
+    
+    // Parallelogram Dimensions - Fitted with proportions and breathing room around head
+    const boxW = 380;
+    const boxH = 340;
+    const skew = 45; // Slant for Parallelogram
 
     if (userImage) {
       const offCanvas = document.createElement('canvas');
@@ -129,37 +133,47 @@ export default function GenerateurAffiche() {
       const offCtx = offCanvas.getContext('2d');
 
       if (offCtx) {
+        // Fit photo nicely without cropping head too tightly
         const aspect = userImage.width / userImage.height;
-        let drawW = radius * 2 * photoZoom * 1.25;
+        let drawW = boxW * photoZoom * 0.95;
         let drawH = drawW / aspect;
 
-        if (drawH < radius * 2 * photoZoom * 1.25) {
-          drawH = radius * 2 * photoZoom * 1.25;
+        if (drawH < boxH * photoZoom * 0.95) {
+          drawH = boxH * photoZoom * 0.95;
           drawW = drawH * aspect;
         }
 
         const drawX = targetX - drawW / 2;
         const drawY = targetY - drawH / 2;
 
-        // Draw photo onto offscreen canvas
+        // Draw user photo onto offscreen canvas
         offCtx.drawImage(userImage, drawX, drawY, drawW, drawH);
 
-        // Apply radial progressive opacity mask (Fondu des contours)
+        // Apply Parallelogram Mask
         offCtx.globalCompositeOperation = 'destination-in';
-        const outerR = radius * photoZoom * 1.15;
-        const innerR = outerR * 0.45; // Smooth radial gradient fade
+        
+        // Create Parallelogram Path
+        offCtx.beginPath();
+        offCtx.moveTo(targetX - boxW / 2 + skew, targetY - boxH / 2);
+        offCtx.lineTo(targetX + boxW / 2 + skew, targetY - boxH / 2);
+        offCtx.lineTo(targetX + boxW / 2 - skew, targetY + boxH / 2);
+        offCtx.lineTo(targetX - boxW / 2 - skew, targetY + boxH / 2);
+        offCtx.closePath();
+        
+        offCtx.fillStyle = '#000000';
+        offCtx.fill();
 
-        const maskGrad = offCtx.createRadialGradient(targetX, targetY, innerR, targetX, targetY, outerR);
+        // Soft Radial Edge Feathering over the Parallelogram
+        const gradRadius = Math.max(boxW, boxH) * 0.65;
+        const maskGrad = offCtx.createRadialGradient(targetX, targetY, gradRadius * 0.5, targetX, targetY, gradRadius * 1.05);
         maskGrad.addColorStop(0, 'rgba(0, 0, 0, 1)');
-        maskGrad.addColorStop(0.7, 'rgba(0, 0, 0, 0.7)');
+        maskGrad.addColorStop(0.7, 'rgba(0, 0, 0, 0.85)');
         maskGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
         offCtx.fillStyle = maskGrad;
-        offCtx.beginPath();
-        offCtx.arc(targetX, targetY, outerR, 0, Math.PI * 2);
         offCtx.fill();
 
-        // Draw the feathered photo onto the main canvas
+        // Draw the Parallelogram Photo onto main canvas
         ctx.drawImage(offCanvas, 0, 0);
       }
     } else {
