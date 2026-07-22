@@ -166,7 +166,8 @@ export default function InscriptionsClient({ debatData, cifData, deleguesData }:
             <table style={s.table}>
               <thead>
                 <tr>
-                  {['Date', 'N° Place', 'Nom & Prénom', 'Genre', 'Type', 'Organisation', 'Pays/Ville', 'Contact', ...(!readOnly ? ['Actions'] : [])].map(h => (
+                  {['Date', 'N° Place', 'Photo', 'Nom & Prénom', 'Genre', 'Type', 'Organisation', 'Pays/Ville', 'Contact', ...(!readOnly ? ['Actions'] : [])].map(h => (
+
                     <th key={h} style={s.th}>{h}</th>
                   ))}
                 </tr>
@@ -178,9 +179,20 @@ export default function InscriptionsClient({ debatData, cifData, deleguesData }:
                     <td style={s.td}>
                       {row.numero_chaise ? <span style={{...s.badge, background: 'rgba(16,185,129,0.1)', color:'#10B981'}}>#{row.numero_chaise}</span> : '—'}
                     </td>
+                    <td style={s.td}>
+                      {row.photo_profil ? (
+                        <a href={row.photo_profil} target="_blank" rel="noopener noreferrer">
+                          <img src={row.photo_profil} alt="Profil" style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #E2E8F0' }} />
+                        </a>
+                      ) : '—'}
+                    </td>
                     <td style={{...s.td, fontWeight: '600'}}>{row.nom_prenom}</td>
                     <td style={s.td}><span style={{...s.badge, background: row.genre === 'Femme' ? 'rgba(236,72,153,0.1)' : 'rgba(99,102,241,0.1)', color: row.genre === 'Femme' ? '#EC4899' : '#6366F1'}}>{row.genre}</span></td>
-                    <td style={s.td}><span style={s.badge}>{row.type_participant?.replace(/_/g,' ')}</span></td>
+                    <td style={s.td}>
+                      <span style={s.badge}>{row.type_participant?.replace(/_/g,' ')}</span>
+                      {row.poste && <div style={{ fontSize: '0.75rem', color: '#64748B', marginTop: '4px' }}>{row.poste}</div>}
+                    </td>
+
                     <td style={s.td}>{row.organisation}</td>
                     <td style={s.td}>{row.ville_pays}</td>
                     <td style={s.td}>

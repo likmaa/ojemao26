@@ -1,9 +1,11 @@
 'use client';
 
-import { useActionState, useState } from 'react';
+import { useActionState, useState, startTransition, useRef } from 'react';
 import Link from 'next/link';
 import { submitInscriptionDebat } from '@/app/lib/actions';
+import { supabase } from '@/app/lib/supabase';
 import FormField from '@/app/components/FormField';
+
 import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 import ReCAPTCHA from 'react-google-recaptcha';
@@ -14,6 +16,10 @@ export default function InscriptionDebat() {
   const [phone, setPhone] = useState<string | undefined>(state?.fields?.telephone || '');
   const [participerCif, setParticiperCif] = useState(state?.fields?.participer_cif || 'non');
   const [poste, setPoste] = useState(state?.fields?.poste || '');
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
+
 
   const handleParticipantTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setParticipantType(e.target.value);
@@ -44,6 +50,33 @@ export default function InscriptionDebat() {
     { value: 'SGACS', label: 'Secrétaire Général Adjoint du Comité Scientifique (SGACS)' },
     { value: 'MCS', label: 'Membre du Comité Scientifique (MCS)' },
   ];
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!formRef.current) return;
+    const formData = new FormData(formRef.current);
+    
+    if ((participantType === 'comite_orga' || participantType === 'comite_scientifique') && photoFile) {
+      setUploading(true);
+      const fileExt = photoFile.name.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
+      const { data, error } = await supabase.storage.from('badges').upload(fileName, photoFile);
+      
+      setUploading(false);
+      if (error) {
+        alert('Erreur lors du chargement de la photo: ' + error.message);
+        return;
+      }
+      
+      const { data: publicUrlData } = supabase.storage.from('badges').getPublicUrl(fileName);
+      formData.set('photo_profil', publicUrlData.publicUrl);
+    }
+    
+    startTransition(() => {
+      formAction(formData);
+    });
+  };
+
 
   return (
     <main style={styles.page} className="animate-fade-in">
@@ -79,7 +112,7 @@ export default function InscriptionDebat() {
               </div>
             </div>
           ) : (
-            <form action={formAction} style={styles.form}>
+            <form ref={formRef} onSubmit={handleSubmit} style={styles.form}>
               {state?.error && (
                 <div style={styles.errorAlert}>
                   ❌ {state.error}
@@ -187,28 +220,55 @@ export default function InscriptionDebat() {
               {/* Conditional Poste Field for Comites */}
               {(participantType === 'comite_orga' || participantType === 'comite_scientifique') && (
                 <div style={{ animation: 'fadeIn 0.3s ease-out' }}>
-                  <div style={styles.selectWrapper}>
-                    <label htmlFor="poste" style={styles.label}>
-                      Poste au sein du comité <span style={{ color: 'var(--accent)' }}>*</span>
-                    </label>
-                    <select
-                      name="poste"
-                      id="poste"
-                      required
-                      value={poste}
-                      onChange={(e) => setPoste(e.target.value)}
-                      style={styles.select as React.CSSProperties}
-                      className="form-input-focus"
-                    >
-                      <option value="" disabled style={{ background: '#FFFFFF', color: '#94A3B8' }}>
-                        Sélectionnez votre poste
-                      </option>
-                      {(participantType === 'comite_orga' ? comiteOrgaPostes : comiteScientifiquePostes).map((opt) => (
-                        <option key={opt.value} value={opt.value} style={{ background: '#FFFFFF', color: 'var(--text-dark)' }}>
-                          {opt.label}
+                  {participantType === 'comite_orga' ? (
+                    <div style={styles.selectWrapper}>
+                      <label htmlFor="poste" style={styles.label}>
+                        Poste au sein du comité <span style={{ color: 'var(--accent)' }}>*</span>
+                      </label>
+                      <select
+                        name="poste"
+                        id="poste"
+                        required
+                        value={poste}
+                        onChange={(e) => setPoste(e.target.value)}
+                        style={styles.select as React.CSSProperties}
+                        className="form-input-focus"
+                      >
+                        <option value="" disabled style={{ background: '#FFFFFF', color: '#94A3B8' }}>
+                          Sélectionnez votre poste
                         </option>
-                      ))}
-                    </select>
+                        {comiteOrgaPostes.map((opt) => (
+                          <option key={opt.value} value={opt.value} style={{ background: '#FFFFFF', color: 'var(--text-dark)' }}>
+                            {opt.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  ) : (
+                    <FormField
+                      label="Poste (Commission / Sous-commission)"
+                      name="poste"
+                      required={true}
+                      placeholder="Ex: Président de sous-commission, Membre..."
+                      defaultValue={poste}
+                    />
+                  )}
+                  
+                  {/* Photo Upload Field */}
+                  <div style={{ marginTop: '1.5rem' }}>
+                    <label htmlFor="photo_profil" style={styles.label}>
+                      Photo de profil (Pour le badge) <span style={{ color: 'var(--accent)' }}>*</span>
+                    </label>
+                    <input
+                      type="file"
+                      id="photo_profil"
+                      accept="image/*"
+                      required
+                      onChange={(e) => setPhotoFile(e.target.files ? e.target.files[0] : null)}
+                      style={{ ...styles.select, padding: '0.5rem', background: '#FFFFFF' } as React.CSSProperties}
+                      className="form-input-focus"
+                    />
+                    <p style={{ fontSize: '0.8rem', color: '#64748B', marginTop: '0.25rem' }}>Format image uniquement (JPG, PNG). Max 5MB.</p>
                   </div>
                 </div>
               )}
@@ -377,14 +437,10 @@ export default function InscriptionDebat() {
                 />
               </div>
 
-              <button
-                type="submit"
-                disabled={pending}
-                className="btn btn-primary"
-                style={styles.submitBtn}
-              >
-                {pending ? 'Enregistrement en cours...' : "Valider mon inscription"}
+              <button type="submit" style={styles.submitBtn} disabled={pending || uploading}>
+                {uploading ? 'Chargement de la photo...' : pending ? 'Validation en cours...' : 'Valider mon inscription'}
               </button>
+
             </form>
           )}
         </div>

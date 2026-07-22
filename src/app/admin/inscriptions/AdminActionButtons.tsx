@@ -125,6 +125,12 @@ export default function AdminActionButtons({ id, table, data, currentStatus }: A
                       <a href={value as string} target="_blank" rel="noopener noreferrer" style={{ color: '#3B82F6', textDecoration: 'underline' }}>
                         Voir le document <FaFileAlt />
                       </a>
+                    ) : key === 'photo_profil' && value ? (
+                      <div>
+                        <a href={value as string} target="_blank" rel="noopener noreferrer">
+                          <img src={value as string} alt="Photo de profil" style={{ width: '80px', height: '80px', borderRadius: '8px', objectFit: 'cover', border: '1px solid #E2E8F0' }} />
+                        </a>
+                      </div>
                     ) : (
                       <span style={detailValueStyle}>
                         {value !== null && value !== undefined && value !== '' ? String(value) : <em style={{color: '#94A3B8'}}>Non renseigné</em>}

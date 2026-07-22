@@ -10,6 +10,7 @@ export interface InscriptionDebatInput {
   organe_presse?: string;
   participer_cif: string; // 'oui' | 'non'
   poste?: string;
+  photo_profil?: string;
   immatriculation?: string;
   numero_chaise?: number;
 }

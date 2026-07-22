@@ -78,6 +78,7 @@ export async function submitInscriptionDebat(prevState: any, formData: FormData)
   const participer_cif = formData.get('participer_cif') as string;
   const consent = formData.get('consent') as string;
   const poste = formData.get('poste') as string || undefined;
+  const photo_profil = formData.get('photo_profil') as string || undefined;
 
   // Extra CIF fields
   const tranche_age = formData.get('tranche_age') as string;
@@ -131,6 +132,7 @@ export async function submitInscriptionDebat(prevState: any, formData: FormData)
     organe_presse,
     participer_cif,
     poste,
+    photo_profil,
   };
 
   if (isSupabaseConfigured()) {
