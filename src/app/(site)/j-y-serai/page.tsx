@@ -117,21 +117,52 @@ export default function GenerateurAffiche() {
     // Clear canvas
     ctx.clearRect(0, 0, W, H);
 
-    // 1. Draw User Photo directly behind the Gabarit PNG (No shape mask)
+    // 1. Draw User Photo (Clean Natural Portrait with Soft Bottom Gradient Fade into Text Bar)
     const targetX = selectedPreset.defaultPhotoX + photoOffsetX;
     const targetY = selectedPreset.defaultPhotoY + photoOffsetY;
-    const boxW = 550;
-    const boxH = 550;
+    const boxW = 520;
+    const boxH = 520;
 
     if (userImage) {
-      const aspect = userImage.width / userImage.height;
-      let drawW = boxW * photoZoom;
-      let drawH = drawW / aspect;
+      const offCanvas = document.createElement('canvas');
+      offCanvas.width = W;
+      offCanvas.height = H;
+      const offCtx = offCanvas.getContext('2d');
 
-      const drawX = targetX - drawW / 2;
-      const drawY = targetY - drawH / 2;
+      if (offCtx) {
+        const aspect = userImage.width / userImage.height;
+        let drawW = boxW * photoZoom;
+        let drawH = drawW / aspect;
 
-      ctx.drawImage(userImage, drawX, drawY, drawW, drawH);
+        if (drawH < boxH * photoZoom) {
+          drawH = boxH * photoZoom;
+          drawW = drawH * aspect;
+        }
+
+        const drawX = targetX - drawW / 2;
+        const drawY = targetY - drawH / 2;
+
+        // Draw natural user portrait photo
+        offCtx.drawImage(userImage, drawX, drawY, drawW, drawH);
+
+        // Apply Linear Vertical Gradient Mask (Only fading the bottom of the body into the banner)
+        offCtx.globalCompositeOperation = 'destination-in';
+        
+        const fadeTop = targetY + (drawH / 2) * 0.2; // Start fading lower torso
+        const fadeBottom = targetY + (drawH / 2) * 0.95; // Fully transparent at bottom
+
+        const fadeGrad = offCtx.createLinearGradient(0, targetY - drawH / 2, 0, fadeBottom);
+        fadeGrad.addColorStop(0, 'rgba(0, 0, 0, 1)');
+        fadeGrad.addColorStop(0.65, 'rgba(0, 0, 0, 1)');
+        fadeGrad.addColorStop(0.9, 'rgba(0, 0, 0, 0.4)');
+        fadeGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+        offCtx.fillStyle = fadeGrad;
+        offCtx.fillRect(0, 0, W, H);
+
+        // Draw the natural portrait onto main canvas
+        ctx.drawImage(offCanvas, 0, 0);
+      }
     } else {
       ctx.fillStyle = '#CBD5E1';
       ctx.fillRect(0, 0, W, H);
