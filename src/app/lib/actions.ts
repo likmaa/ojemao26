@@ -303,15 +303,34 @@ export async function submitInscriptionCif(prevState: any, formData: FormData) {
   const fields = Object.fromEntries(formData.entries()) as Record<string, string>;
   const recaptchaValue = formData.get('g-recaptcha-response') as string;
 
-  // Simple validation
-  if (!nom_prenom || !genre || !tranche_age || !ville_pays || !statut || !etablissement || !whatsapp || !email || !association || !attente || !moyen_deplacement || !date_arrivee || !date_depart || !comment_connu) {
-    return { success: false, error: 'Veuillez remplir tous les champs obligatoires.', fields };
+  // Detailed validation with explicit missing field reporting
+  const missingFields: string[] = [];
+  if (!nom_prenom) missingFields.push('Nom & Prénom');
+  if (!genre) missingFields.push('Genre');
+  if (!tranche_age) missingFields.push("Tranche d'âge");
+  if (!ville_pays) missingFields.push('Ville & Pays de résidence');
+  if (!statut) missingFields.push('Statut professionnel / social');
+  if (!etablissement) missingFields.push('Établissement / Organisation');
+  if (!whatsapp) missingFields.push('Numéro WhatsApp');
+  if (!email) missingFields.push('Adresse Email');
+  if (!association) missingFields.push("Association d'appartenance");
+  if (!moyen_deplacement) missingFields.push('Moyen de déplacement');
+  if (!date_arrivee) missingFields.push("Date & Heure d'arrivée");
+  if (!date_depart) missingFields.push("Date & Heure de départ");
+  if (!comment_connu) missingFields.push('Comment as-tu connu le CIF');
+
+  if (missingFields.length > 0) {
+    return { 
+      success: false, 
+      error: `Veuillez remplir le(s) champ(s) obligatoire(s) suivant(s) : ${missingFields.join(', ')}.`, 
+      fields 
+    };
   }
   if (!consent) {
     return { success: false, error: 'Vous devez accepter les conditions (usage des données) pour valider votre inscription.', fields };
   }
   if (!recaptchaValue) {
-    return { success: false, error: 'Veuillez valider le reCAPTCHA.', fields };
+    return { success: false, error: 'Veuillez valider le reCAPTCHA (Je ne suis pas un robot).', fields };
   }
 
   // Verifier le reCAPTCHA

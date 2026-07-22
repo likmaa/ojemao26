@@ -59,6 +59,7 @@ export default function InscriptionCif() {
                   name="nom_prenom"
                   required={true}
                   placeholder="Ex: Vahama Kamagaté"
+                  defaultValue={state?.fields?.nom_prenom}
                 />
 
                 <FormField
@@ -67,6 +68,7 @@ export default function InscriptionCif() {
                   type="select"
                   required={true}
                   placeholder="Sélectionnez"
+                  defaultValue={state?.fields?.genre}
                   options={[
                     { value: 'M', label: 'Masculin' },
                     { value: 'F', label: 'Féminin' },
@@ -81,6 +83,7 @@ export default function InscriptionCif() {
                   type="select"
                   required={true}
                   placeholder="Sélectionnez votre âge"
+                  defaultValue={state?.fields?.tranche_age}
                   options={[
                     { value: 'moins_18', label: 'Moins de 18 ans' },
                     { value: '18_25', label: '18 à 25 ans' },
@@ -94,6 +97,7 @@ export default function InscriptionCif() {
                   name="ville_pays"
                   required={true}
                   placeholder="Ex: Porto-Novo, Bénin"
+                  defaultValue={state?.fields?.ville_pays}
                 />
               </div>
 
@@ -104,6 +108,7 @@ export default function InscriptionCif() {
                   type="select"
                   required={true}
                   placeholder="Sélectionnez"
+                  defaultValue={state?.fields?.statut}
                   options={[
                     { value: 'etudiant', label: 'Étudiant' },
                     { value: 'jeune_cadre', label: 'Jeune Cadre / Professionnel' },
@@ -117,6 +122,7 @@ export default function InscriptionCif() {
                   name="etablissement"
                   required={true}
                   placeholder="Ex: UAC, ENEAM, Nom Entreprise/ONG"
+                  defaultValue={state?.fields?.etablissement}
                 />
               </div>
 
@@ -127,6 +133,7 @@ export default function InscriptionCif() {
                   type="tel"
                   required={true}
                   placeholder="Ex: +229 95 00 00 00"
+                  defaultValue={state?.fields?.whatsapp}
                 />
 
                 <FormField
@@ -135,6 +142,7 @@ export default function InscriptionCif() {
                   type="email"
                   required={true}
                   placeholder="Ex: contact@exemple.com"
+                  defaultValue={state?.fields?.email}
                 />
               </div>
 
@@ -145,6 +153,7 @@ export default function InscriptionCif() {
                   type="text"
                   required={true}
                   placeholder="Ex: ACEEMUB, OJEMAO, Aucune..."
+                  defaultValue={state?.fields?.association}
                 />
 
                 <FormField
@@ -153,6 +162,7 @@ export default function InscriptionCif() {
                   type="select"
                   required={true}
                   placeholder="Sélectionnez"
+                  defaultValue={state?.fields?.comment_connu}
                   options={[
                     { value: 'reseaux_sociaux', label: 'Réseaux Sociaux' },
                     { value: 'bouche_oreille', label: 'Ami / Bouche à oreille' },
@@ -177,6 +187,7 @@ export default function InscriptionCif() {
                   type="select"
                   required={true}
                   placeholder="Sélectionnez"
+                  defaultValue={state?.fields?.moyen_deplacement}
                   options={[
                     { value: 'avion', label: 'Avion' },
                     { value: 'bus_car', label: 'Bus / Car (transport commun)' },
@@ -190,6 +201,7 @@ export default function InscriptionCif() {
                   name="date_arrivee"
                   required={true}
                   placeholder="Ex: 24/07 à 18h00 ou Vol n°..."
+                  defaultValue={state?.fields?.date_arrivee}
                 />
               </div>
 
@@ -199,6 +211,7 @@ export default function InscriptionCif() {
                   name="date_depart"
                   required={true}
                   placeholder="Ex: 29/07 à 10h00"
+                  defaultValue={state?.fields?.date_depart}
                 />
 
                 <div style={{ display: 'none' }}></div> {/* Empty slot for alignment */}
@@ -214,6 +227,7 @@ export default function InscriptionCif() {
                 type="textarea"
                 required={false}
                 placeholder="Décrivez brièvement vos attentes ou ce que vous espérez apprendre..."
+                defaultValue={state?.fields?.attente}
               />
 
               <div style={{ padding: '1rem', background: '#FFF7ED', borderLeft: '4px solid #EA580C', borderRadius: '4px', marginBottom: '1.5rem', fontSize: '0.95rem', color: '#431407' }}>
@@ -221,7 +235,7 @@ export default function InscriptionCif() {
               </div>
 
               <div style={styles.consentContainer}>
-                <input type="checkbox" id="consent" name="consent" required style={styles.checkbox} />
+                <input type="checkbox" id="consent" name="consent" required defaultChecked={state?.fields?.consent === 'on'} style={styles.checkbox} />
                 <label htmlFor="consent" style={styles.consentLabel}>
                   J'accepte que mes données soient collectées pour les besoins d'organisation et je m'engage à régler mes frais de participation (10 000 FCFA) à mon arrivée sur le site.
                 </label>
