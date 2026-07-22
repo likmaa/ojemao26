@@ -117,35 +117,55 @@ export default function GenerateurAffiche() {
     // Clear canvas
     ctx.clearRect(0, 0, W, H);
 
-    // 1. Draw User Photo in the background slot
+    // 1. Draw User Photo with Progressive Feathered Contours (Fondu Radial Progressif)
     const targetX = selectedPreset.defaultPhotoX + photoOffsetX;
     const targetY = selectedPreset.defaultPhotoY + photoOffsetY;
     const radius = selectedPreset.defaultPhotoRadius;
 
-    ctx.save();
-    // Clip inside the circle if desired, or draw freely behind the overlay transparent window
-    ctx.beginPath();
-    ctx.arc(targetX, targetY, radius * photoZoom, 0, Math.PI * 2);
-    ctx.clip();
-
     if (userImage) {
-      const aspect = userImage.width / userImage.height;
-      let drawW = radius * 2 * photoZoom;
-      let drawH = drawW / aspect;
+      const offCanvas = document.createElement('canvas');
+      offCanvas.width = W;
+      offCanvas.height = H;
+      const offCtx = offCanvas.getContext('2d');
 
-      if (drawH < radius * 2 * photoZoom) {
-        drawH = radius * 2 * photoZoom;
-        drawW = drawH * aspect;
+      if (offCtx) {
+        const aspect = userImage.width / userImage.height;
+        let drawW = radius * 2 * photoZoom * 1.25;
+        let drawH = drawW / aspect;
+
+        if (drawH < radius * 2 * photoZoom * 1.25) {
+          drawH = radius * 2 * photoZoom * 1.25;
+          drawW = drawH * aspect;
+        }
+
+        const drawX = targetX - drawW / 2;
+        const drawY = targetY - drawH / 2;
+
+        // Draw photo onto offscreen canvas
+        offCtx.drawImage(userImage, drawX, drawY, drawW, drawH);
+
+        // Apply radial progressive opacity mask (Fondu des contours)
+        offCtx.globalCompositeOperation = 'destination-in';
+        const outerR = radius * photoZoom * 1.15;
+        const innerR = outerR * 0.45; // Smooth radial gradient fade
+
+        const maskGrad = offCtx.createRadialGradient(targetX, targetY, innerR, targetX, targetY, outerR);
+        maskGrad.addColorStop(0, 'rgba(0, 0, 0, 1)');
+        maskGrad.addColorStop(0.7, 'rgba(0, 0, 0, 0.7)');
+        maskGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+        offCtx.fillStyle = maskGrad;
+        offCtx.beginPath();
+        offCtx.arc(targetX, targetY, outerR, 0, Math.PI * 2);
+        offCtx.fill();
+
+        // Draw the feathered photo onto the main canvas
+        ctx.drawImage(offCanvas, 0, 0);
       }
-
-      const drawX = targetX - drawW / 2;
-      const drawY = targetY - drawH / 2;
-      ctx.drawImage(userImage, drawX, drawY, drawW, drawH);
     } else {
       ctx.fillStyle = '#CBD5E1';
       ctx.fillRect(0, 0, W, H);
     }
-    ctx.restore();
 
     // 2. Draw Official Overlay Gabarit PNG on top
     if (overlayImage) {
