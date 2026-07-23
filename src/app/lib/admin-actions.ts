@@ -69,6 +69,34 @@ export async function updateInscription(
 }
 
 // ============================================================
+// INSCRIPTIONS — Upload photo from admin edit modal
+// ============================================================
+export async function uploadInscriptionPhoto(formData: FormData) {
+  await checkAdminAuth();
+  if (!isSupabaseConfigured()) return { success: false, error: "Supabase n'est pas configuré" };
+  try {
+    const file = formData.get('file') as File;
+    if (!file || file.size === 0) {
+      return { success: false, error: "Fichier invalide" };
+    }
+    const ext = file.name.split('.').pop() || 'jpg';
+    const fileName = `admin_photo_${Date.now()}_${Math.random().toString(36).substring(2, 7)}.${ext}`;
+    
+    const { data, error } = await supabaseAdmin.storage.from('badges').upload(fileName, file, {
+      cacheControl: '3600',
+      upsert: true
+    });
+    
+    if (error) throw error;
+
+    const { data: publicUrlData } = supabaseAdmin.storage.from('badges').getPublicUrl(fileName);
+    return { success: true, url: publicUrlData.publicUrl };
+  } catch (error: any) {
+    return { success: false, error: error.message || "Erreur lors de l'envoi de la photo" };
+  }
+}
+
+// ============================================================
 // SCAN QR — Vérifier un passe
 // ============================================================
 export async function verifyPass(id: string) {

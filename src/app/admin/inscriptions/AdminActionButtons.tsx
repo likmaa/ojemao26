@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { deleteInscription, updateStatus, validerDelegue, updateInscription } from '@/app/lib/admin-actions';
-import { FaTrash, FaCheck, FaEye, FaTimes, FaTicketAlt, FaFileAlt, FaEdit } from 'react-icons/fa';
+import { deleteInscription, updateStatus, validerDelegue, updateInscription, uploadInscriptionPhoto } from '@/app/lib/admin-actions';
+import { FaTrash, FaCheck, FaEye, FaTimes, FaTicketAlt, FaFileAlt, FaEdit, FaUpload, FaImage } from 'react-icons/fa';
 import { QRCodeCanvas } from 'qrcode.react';
 
 interface AdminActionButtonsProps {
@@ -30,7 +30,7 @@ const fieldLabels: Record<string, string> = {
   immatriculation: 'Matricule',
   organe_presse: 'Organe de presse',
   participer_cif: 'Participer au CIF',
-  photo_profil: 'URL Photo de profil',
+  photo_profil: 'Photo de profil',
   tranche_age: "Tranche d'âge",
   statut: 'Statut',
   association: 'Association',
@@ -50,6 +50,21 @@ export default function AdminActionButtons({ id, table, data, currentStatus }: A
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editFormData, setEditFormData] = useState<Record<string, any>>({});
   const [isSaving, setIsSaving] = useState(false);
+  const [uploadingKey, setUploadingKey] = useState<string | null>(null);
+
+  const handleFileUpload = async (key: string, file: File) => {
+    if (!file) return;
+    setUploadingKey(key);
+    const formData = new FormData();
+    formData.append('file', file);
+    const res = await uploadInscriptionPhoto(formData);
+    if (res.success && res.url) {
+      handleEditChange(key, res.url);
+    } else {
+      alert(res.error || "Erreur lors du téléversement de l'image.");
+    }
+    setUploadingKey(null);
+  };
 
   const handleOpenEdit = () => {
     const initial = { ...data };
@@ -424,6 +439,61 @@ export default function AdminActionButtons({ id, table, data, currentStatus }: A
                           <option value="voiture_perso">Voiture personnelle</option>
                           <option value="autre">Autre</option>
                         </select>
+                      </div>
+                    );
+                  }
+
+                  if (key === 'photo_profil' || key.includes('photo') || key.includes('image') || key.includes('badge')) {
+                    return (
+                      <div key={key} style={fieldContainerStyle}>
+                        <label style={labelStyle}>{label}</label>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                          {val && typeof val === 'string' && (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.5rem', background: '#F8FAFC', borderRadius: '6px', border: '1px solid #E2E8F0' }}>
+                              <img src={val} alt="Aperçu" style={{ width: '60px', height: '60px', borderRadius: '6px', objectFit: 'cover', border: '1px solid #CBD5E1' }} />
+                              <div style={{ fontSize: '0.8rem', color: '#64748B', wordBreak: 'break-all' }}>
+                                <strong>Aperçu actuel :</strong><br />
+                                <a href={val} target="_blank" rel="noopener noreferrer" style={{ color: '#3B82F6', textDecoration: 'underline' }}>
+                                  Ouvrir en plein écran
+                                </a>
+                              </div>
+                            </div>
+                          )}
+                          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                            <input
+                              type="text"
+                              placeholder="URL de l'image (https://...)"
+                              value={val ?? ''}
+                              onChange={e => handleEditChange(key, e.target.value)}
+                              style={{ ...inputStyle, flex: 1 }}
+                            />
+                            <label style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '0.4rem',
+                              padding: '0.5rem 0.75rem',
+                              background: uploadingKey === key ? '#94A3B8' : '#3B82F6',
+                              color: 'white',
+                              borderRadius: '4px',
+                              cursor: uploadingKey === key ? 'not-allowed' : 'pointer',
+                              fontSize: '0.85rem',
+                              fontWeight: '600',
+                              whiteSpace: 'nowrap'
+                            }}>
+                              {uploadingKey === key ? 'Chargement...' : <><FaUpload /> Importer une image</>}
+                              <input
+                                type="file"
+                                accept="image/*"
+                                disabled={uploadingKey === key}
+                                style={{ display: 'none' }}
+                                onChange={e => {
+                                  const f = e.target.files?.[0];
+                                  if (f) handleFileUpload(key, f);
+                                }}
+                              />
+                            </label>
+                          </div>
+                        </div>
                       </div>
                     );
                   }
