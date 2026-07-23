@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { FaDownload, FaShareAlt, FaImage, FaSyncAlt, FaArrowLeft, FaCheckCircle, FaSlidersH } from 'react-icons/fa';
+import { FaDownload, FaShareAlt, FaImage, FaSyncAlt, FaArrowLeft, FaCheckCircle, FaSlidersH, FaArrowsAlt } from 'react-icons/fa';
 
 interface GabaritPreset {
   id: string;
@@ -11,7 +11,8 @@ interface GabaritPreset {
   imageSrc: string;
   defaultPhotoX: number;
   defaultPhotoY: number;
-  defaultPhotoRadius: number;
+  defaultBoxW: number;
+  defaultBoxH: number;
   defaultNameY: number;
   defaultRoleY: number;
   defaultTextColor: string;
@@ -24,8 +25,9 @@ const PRESETS: GabaritPreset[] = [
     subtitle: 'Samedi 25 Juillet 2026 • Bénin Royal Hôtel',
     imageSrc: '/images/gabarit-debat.png',
     defaultPhotoX: 540,
-    defaultPhotoY: 535,
-    defaultPhotoRadius: 280,
+    defaultPhotoY: 520,
+    defaultBoxW: 550,
+    defaultBoxH: 450,
     defaultNameY: 770,
     defaultRoleY: 805,
     defaultTextColor: '#0F172A',
@@ -37,7 +39,8 @@ const PRESETS: GabaritPreset[] = [
     imageSrc: '/images/gabarit-cif.png',
     defaultPhotoX: 780,
     defaultPhotoY: 400,
-    defaultPhotoRadius: 200,
+    defaultBoxW: 420,
+    defaultBoxH: 560,
     defaultNameY: 770,
     defaultRoleY: 805,
     defaultTextColor: '#0F172A',
@@ -54,11 +57,17 @@ export default function GenerateurAffiche() {
   const [photoZoom, setPhotoZoom] = useState(1);
   const [photoOffsetX, setPhotoOffsetX] = useState(0);
   const [photoOffsetY, setPhotoOffsetY] = useState(0);
+  const [enableFadeBottom, setEnableFadeBottom] = useState(true);
+  const [layerMode, setLayerMode] = useState<'behind' | 'above'>('behind');
 
   // Text controls
   const [textOffsetY, setTextOffsetY] = useState(0);
-  const [textColor, setTextColor] = useState('#FFFFFF');
-  const [textSize, setTextSize] = useState(38);
+  const [textColor, setTextColor] = useState('#0F172A');
+  const [textSize, setTextSize] = useState(36);
+
+  // Interactivity (Drag to Move)
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
   const [downloaded, setDownloaded] = useState(false);
   const [overlayImage, setOverlayImage] = useState<HTMLImageElement | null>(null);
@@ -72,6 +81,8 @@ export default function GenerateurAffiche() {
     img.onload = () => {
       setOverlayImage(img);
       setTextColor(selectedPreset.defaultTextColor);
+      setPhotoOffsetX(0);
+      setPhotoOffsetY(0);
     };
   }, [selectedPreset]);
 
@@ -102,7 +113,42 @@ export default function GenerateurAffiche() {
     reader.readAsDataURL(file);
   };
 
-  // Draw on Canvas
+  // Dragging Handlers for Canvas
+  const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    setIsDragging(true);
+    setDragStart({ x: e.clientX, y: e.clientY });
+  };
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (!isDragging) return;
+    const dx = e.clientX - dragStart.x;
+    const dy = e.clientY - dragStart.y;
+    setPhotoOffsetX((prev) => prev + dx * 2);
+    setPhotoOffsetY((prev) => prev + dy * 2);
+    setDragStart({ x: e.clientX, y: e.clientY });
+  };
+
+  const handleMouseUp = () => setIsDragging(false);
+
+  const handleTouchStart = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    if (e.touches.length === 1) {
+      setIsDragging(true);
+      setDragStart({ x: e.touches[0].clientX, y: e.touches[0].clientY });
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    if (!isDragging || e.touches.length !== 1) return;
+    const dx = e.touches[0].clientX - dragStart.x;
+    const dy = e.touches[0].clientY - dragStart.y;
+    setPhotoOffsetX((prev) => prev + dx * 2);
+    setPhotoOffsetY((prev) => prev + dy * 2);
+    setDragStart({ x: e.touches[0].clientX, y: e.touches[0].clientY });
+  };
+
+  const handleTouchEnd = () => setIsDragging(false);
+
+  // Render Canvas
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -114,77 +160,76 @@ export default function GenerateurAffiche() {
     canvas.width = W;
     canvas.height = H;
 
-    // Clear canvas
     ctx.clearRect(0, 0, W, H);
 
-    // 1. Draw User Photo (Clean Natural Portrait with Soft Bottom Gradient Fade into Text Bar)
     const targetX = selectedPreset.defaultPhotoX + photoOffsetX;
     const targetY = selectedPreset.defaultPhotoY + photoOffsetY;
-    const boxW = 520;
-    const boxH = 520;
+    const boxW = selectedPreset.defaultBoxW;
+    const boxH = selectedPreset.defaultBoxH;
 
-    if (userImage) {
-      const offCanvas = document.createElement('canvas');
-      offCanvas.width = W;
-      offCanvas.height = H;
-      const offCtx = offCanvas.getContext('2d');
+    const drawPhoto = (targetCtx: CanvasRenderingContext2D) => {
+      if (!userImage) return;
 
-      if (offCtx) {
-        const aspect = userImage.width / userImage.height;
-        let drawW = boxW * photoZoom;
-        let drawH = drawW / aspect;
+      const aspect = userImage.width / userImage.height;
+      let drawW = boxW * photoZoom;
+      let drawH = drawW / aspect;
 
-        if (drawH < boxH * photoZoom) {
-          drawH = boxH * photoZoom;
-          drawW = drawH * aspect;
-        }
-
-        const drawX = targetX - drawW / 2;
-        const drawY = targetY - drawH / 2;
-
-        // Draw natural user portrait photo
-        offCtx.drawImage(userImage, drawX, drawY, drawW, drawH);
-
-        // Apply Linear Vertical Gradient Mask (Only fading the bottom of the body into the banner)
-        offCtx.globalCompositeOperation = 'destination-in';
-        
-        const fadeTop = targetY + (drawH / 2) * 0.2; // Start fading lower torso
-        const fadeBottom = targetY + (drawH / 2) * 0.95; // Fully transparent at bottom
-
-        const fadeGrad = offCtx.createLinearGradient(0, targetY - drawH / 2, 0, fadeBottom);
-        fadeGrad.addColorStop(0, 'rgba(0, 0, 0, 1)');
-        fadeGrad.addColorStop(0.65, 'rgba(0, 0, 0, 1)');
-        fadeGrad.addColorStop(0.9, 'rgba(0, 0, 0, 0.4)');
-        fadeGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-
-        offCtx.fillStyle = fadeGrad;
-        offCtx.fillRect(0, 0, W, H);
-
-        // Draw the natural portrait onto main canvas
-        ctx.drawImage(offCanvas, 0, 0);
+      if (drawH < boxH * photoZoom) {
+        drawH = boxH * photoZoom;
+        drawW = drawH * aspect;
       }
+
+      const drawX = targetX - drawW / 2;
+      const drawY = targetY - drawH / 2;
+
+      if (enableFadeBottom) {
+        const offCanvas = document.createElement('canvas');
+        offCanvas.width = W;
+        offCanvas.height = H;
+        const offCtx = offCanvas.getContext('2d');
+
+        if (offCtx) {
+          offCtx.drawImage(userImage, drawX, drawY, drawW, drawH);
+          offCtx.globalCompositeOperation = 'destination-in';
+
+          const fadeBottom = targetY + (drawH / 2) * 0.95;
+          const fadeGrad = offCtx.createLinearGradient(0, targetY - drawH / 2, 0, fadeBottom);
+          fadeGrad.addColorStop(0, 'rgba(0, 0, 0, 1)');
+          fadeGrad.addColorStop(0.65, 'rgba(0, 0, 0, 1)');
+          fadeGrad.addColorStop(0.9, 'rgba(0, 0, 0, 0.4)');
+          fadeGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+          offCtx.fillStyle = fadeGrad;
+          offCtx.fillRect(0, 0, W, H);
+
+          targetCtx.drawImage(offCanvas, 0, 0);
+        }
+      } else {
+        targetCtx.drawImage(userImage, drawX, drawY, drawW, drawH);
+      }
+    };
+
+    if (layerMode === 'behind') {
+      // Photo drawn behind overlay
+      drawPhoto(ctx);
+      if (overlayImage) ctx.drawImage(overlayImage, 0, 0, W, H);
     } else {
-      ctx.fillStyle = '#CBD5E1';
-      ctx.fillRect(0, 0, W, H);
+      // Overlay drawn first, photo on top
+      if (overlayImage) ctx.drawImage(overlayImage, 0, 0, W, H);
+      drawPhoto(ctx);
     }
 
-    // 2. Draw Official Overlay Gabarit PNG on top
-    if (overlayImage) {
-      ctx.drawImage(overlayImage, 0, 0, W, H);
-    }
-
-    // 3. Draw User Name & Role Text on top of Gabarit
+    // Draw Text on top
     if (name) {
       const nameY = selectedPreset.defaultNameY + textOffsetY;
-      
+
       ctx.save();
       ctx.textAlign = 'center';
       ctx.fillStyle = textColor;
       ctx.font = `800 ${textSize}px "Outfit", "Inter", sans-serif`;
 
-      // Text shadow for high readability
       ctx.shadowColor = textColor === '#FFFFFF' ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.6)';
-      ctx.shadowBlur = 8;
+      ctx.shadowBlur = 6;
       ctx.fillText(name.toUpperCase(), W / 2, nameY);
 
       if (role) {
@@ -194,7 +239,7 @@ export default function GenerateurAffiche() {
       }
       ctx.restore();
     }
-  }, [selectedPreset, overlayImage, userImage, name, role, photoZoom, photoOffsetX, photoOffsetY, textOffsetY, textColor, textSize]);
+  }, [selectedPreset, overlayImage, userImage, name, role, photoZoom, photoOffsetX, photoOffsetY, enableFadeBottom, layerMode, textOffsetY, textColor, textSize]);
 
   // Download Action
   const handleDownload = () => {
@@ -232,7 +277,7 @@ export default function GenerateurAffiche() {
           <span style={styles.badgeTag}>Générateur Officiel OJEMAO 2026</span>
           <h1 style={styles.mainHeading}>Créez votre Affiche "J'y serai !" 🖼️</h1>
           <p style={styles.subHeading}>
-            Générez votre visuel officiel avec les gabarits originaux du Débat et du Congrès & CIF 2026 en 2 clics !
+            Glissez votre photo directement sur l'aperçu avec la souris ou le doigt pour l'ajuster au millimètre près !
           </p>
         </div>
 
@@ -283,7 +328,7 @@ export default function GenerateurAffiche() {
             </div>
 
             <div style={styles.fieldGroup}>
-              <label style={styles.label}>Importer votre photo de profil</label>
+              <label style={styles.label}>Importer votre photo</label>
               <label style={styles.uploadBtn}>
                 <FaImage style={{ marginRight: '8px' }} /> Choisir ma photo
                 <input type="file" accept="image/*" onChange={handleImageUpload} style={{ display: 'none' }} />
@@ -292,13 +337,19 @@ export default function GenerateurAffiche() {
 
             {/* Ajustements */}
             <div style={styles.adjustBox}>
-              <h3 style={styles.adjustTitle}><FaSlidersH style={{ marginRight: '6px' }} /> Ajustements Cadrage & Texte</h3>
+              <h3 style={styles.adjustTitle}>
+                <FaSlidersH style={{ marginRight: '6px' }} /> Ajustements Fin & Cadrage
+              </h3>
+
+              <div style={{ padding: '0.75rem', background: '#E0F2FE', borderRadius: '8px', marginBottom: '1rem', fontSize: '0.85rem', color: '#0369A1' }}>
+                💡 <strong>Astuce :</strong> Vous pouvez cliquer/toucher et glisser directement la photo sur l'aperçu pour la déplacer !
+              </div>
               
               <div style={styles.sliderGroup}>
                 <label style={styles.sliderLabel}>Zoom Photo ({Math.round(photoZoom * 100)}%)</label>
                 <input
                   type="range"
-                  min="0.5"
+                  min="0.4"
                   max="2.5"
                   step="0.05"
                   value={photoZoom}
@@ -308,33 +359,55 @@ export default function GenerateurAffiche() {
               </div>
 
               <div style={styles.sliderGroup}>
-                <label style={styles.sliderLabel}>Position Photo Horizontale</label>
-                <input
-                  type="range"
-                  min="-250"
-                  max="250"
-                  step="5"
-                  value={photoOffsetX}
-                  onChange={(e) => setPhotoOffsetX(parseInt(e.target.value))}
-                  style={styles.slider}
-                />
+                <label style={styles.sliderLabel}>Disposition de la Photo</label>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <button
+                    onClick={() => setLayerMode('behind')}
+                    style={{
+                      flex: 1,
+                      padding: '0.5rem',
+                      borderRadius: '6px',
+                      fontSize: '0.8rem',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      border: layerMode === 'behind' ? '2px solid #0EA5E9' : '1px solid #CBD5E1',
+                      background: layerMode === 'behind' ? '#F0F9FF' : '#FFFFFF',
+                    }}
+                  >
+                    Sous le cadre (Arrière-plan)
+                  </button>
+                  <button
+                    onClick={() => setLayerMode('above')}
+                    style={{
+                      flex: 1,
+                      padding: '0.5rem',
+                      borderRadius: '6px',
+                      fontSize: '0.8rem',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      border: layerMode === 'above' ? '2px solid #0EA5E9' : '1px solid #CBD5E1',
+                      background: layerMode === 'above' ? '#F0F9FF' : '#FFFFFF',
+                    }}
+                  >
+                    Sur le cadre (Premier plan)
+                  </button>
+                </div>
+              </div>
+
+              <div style={{ ...styles.sliderGroup, marginTop: '0.75rem' }}>
+                <label style={{ ...styles.sliderLabel, display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                  <input
+                    type="checkbox"
+                    checked={enableFadeBottom}
+                    onChange={(e) => setEnableFadeBottom(e.target.checked)}
+                    style={{ marginRight: '8px', accentColor: '#0EA5E9' }}
+                  />
+                  Activer le fondu bas du corps
+                </label>
               </div>
 
               <div style={styles.sliderGroup}>
-                <label style={styles.sliderLabel}>Position Photo Verticale</label>
-                <input
-                  type="range"
-                  min="-250"
-                  max="250"
-                  step="5"
-                  value={photoOffsetY}
-                  onChange={(e) => setPhotoOffsetY(parseInt(e.target.value))}
-                  style={styles.slider}
-                />
-              </div>
-
-              <div style={styles.sliderGroup}>
-                <label style={styles.sliderLabel}>Hauteur du Texte sur l'Affiche</label>
+                <label style={styles.sliderLabel}>Position du Texte (Hauteur)</label>
                 <input
                   type="range"
                   min="-150"
@@ -347,9 +420,9 @@ export default function GenerateurAffiche() {
               </div>
 
               <div style={styles.sliderGroup}>
-                <label style={styles.sliderLabel}>Couleur de la police du Nom</label>
+                <label style={styles.sliderLabel}>Couleur du Texte</label>
                 <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.25rem' }}>
-                  {['#FFFFFF', '#0F172A', '#F59E0B', '#0EA5E9', '#10B981'].map((c) => (
+                  {['#0F172A', '#FFFFFF', '#F59E0B', '#0EA5E9', '#10B981'].map((c) => (
                     <button
                       key={c}
                       onClick={() => setTextColor(c)}
@@ -372,23 +445,40 @@ export default function GenerateurAffiche() {
                   setPhotoOffsetX(0);
                   setPhotoOffsetY(0);
                   setTextOffsetY(0);
+                  setLayerMode('behind');
+                  setEnableFadeBottom(true);
                   setTextColor(selectedPreset.defaultTextColor);
                 }}
                 style={styles.resetBtn}
               >
-                <FaSyncAlt style={{ marginRight: '6px' }} /> Réinitialiser les réglages
+                <FaSyncAlt style={{ marginRight: '6px' }} /> Réinitialiser tous les réglages
               </button>
             </div>
           </div>
 
           {/* Canvas Preview & Export */}
           <div style={styles.previewCard}>
-            <h3 style={{ fontSize: '1rem', fontWeight: '700', color: '#0F172A', marginBottom: '1rem' }}>
-              Aperçu en direct (1080 x 1080 px)
-            </h3>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', marginBottom: '1rem' }}>
+              <h3 style={{ fontSize: '1rem', fontWeight: '700', color: '#0F172A', margin: 0 }}>
+                Aperçu en direct (1080 x 1080 px)
+              </h3>
+              <span style={{ fontSize: '0.8rem', color: '#0EA5E9', fontWeight: '600', display: 'flex', alignItems: 'center' }}>
+                <FaArrowsAlt style={{ marginRight: '4px' }} /> Glissez pour ajuster
+              </span>
+            </div>
             
-            <div style={styles.canvasContainer}>
-              <canvas ref={canvasRef} style={styles.canvasPreview} />
+            <div style={{ ...styles.canvasContainer, cursor: isDragging ? 'grabbing' : 'grab' }}>
+              <canvas
+                ref={canvasRef}
+                onMouseDown={handleMouseDown}
+                onMouseMove={handleMouseMove}
+                onMouseUp={handleMouseUp}
+                onMouseLeave={handleMouseUp}
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+                style={styles.canvasPreview}
+              />
             </div>
 
             {/* Action Buttons */}
@@ -586,6 +676,8 @@ const styles: Record<string, React.CSSProperties> = {
     boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)',
     marginBottom: '1.5rem',
     border: '1px solid #CBD5E1',
+    userSelect: 'none',
+    touchAction: 'none',
   },
   canvasPreview: {
     width: '100%',

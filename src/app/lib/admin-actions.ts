@@ -48,6 +48,27 @@ export async function updateStatus(id: string, table: 'inscriptions_cif', newSta
 }
 
 // ============================================================
+// INSCRIPTIONS — Update generic fields
+// ============================================================
+export async function updateInscription(
+  id: string,
+  table: 'inscriptions_debat' | 'inscriptions_cif' | 'delegues_congres',
+  data: Record<string, any>
+) {
+  await checkAdminAuth();
+  if (!isSupabaseConfigured()) return { success: false, error: "Supabase n'est pas configuré" };
+  try {
+    const { id: _id, created_at: _created_at, scanne_le: _scanne_le, ...updateFields } = data;
+    const { error } = await supabaseAdmin.from(table).update(updateFields).eq('id', id);
+    if (error) throw error;
+    revalidatePath('/admin/inscriptions');
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message || 'Erreur lors de la modification' };
+  }
+}
+
+// ============================================================
 // SCAN QR — Vérifier un passe
 // ============================================================
 export async function verifyPass(id: string) {

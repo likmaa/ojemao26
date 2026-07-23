@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { deleteInscription, updateStatus, validerDelegue } from '@/app/lib/admin-actions';
-import { FaTrash, FaCheck, FaEye, FaTimes, FaTicketAlt, FaFileAlt } from 'react-icons/fa';
+import { deleteInscription, updateStatus, validerDelegue, updateInscription } from '@/app/lib/admin-actions';
+import { FaTrash, FaCheck, FaEye, FaTimes, FaTicketAlt, FaFileAlt, FaEdit } from 'react-icons/fa';
 import { QRCodeCanvas } from 'qrcode.react';
 
 interface AdminActionButtonsProps {
@@ -12,11 +12,69 @@ interface AdminActionButtonsProps {
   currentStatus?: string; // For CIF
 }
 
+const fieldLabels: Record<string, string> = {
+  nom_prenom: 'Nom & Prénom',
+  genre: 'Genre',
+  email: 'Adresse Email',
+  telephone: 'Téléphone',
+  whatsapp: 'Numéro WhatsApp',
+  ville_pays: 'Ville & Pays',
+  pays: 'Pays',
+  organisation: 'Organisation',
+  etablissement: 'Établissement / Organisation',
+  structure: 'Structure représentée',
+  type_participant: 'Type de participant',
+  poste: 'Poste / Sous-commission',
+  mandat: 'Mandat / Fonction',
+  numero_chaise: 'N° de Place',
+  immatriculation: 'Matricule',
+  organe_presse: 'Organe de presse',
+  participer_cif: 'Participer au CIF',
+  photo_profil: 'URL Photo de profil',
+  tranche_age: "Tranche d'âge",
+  statut: 'Statut',
+  association: 'Association',
+  moyen_deplacement: 'Moyen de déplacement',
+  date_arrivee: "Date & Heure d'arrivée",
+  date_depart: "Date & Heure de départ",
+  comment_connu: 'Comment connu',
+  attente: 'Attentes',
+  nombre_delegues: 'Nombre de délégués',
+};
+
 export default function AdminActionButtons({ id, table, data, currentStatus }: AdminActionButtonsProps) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPassModalOpen, setIsPassModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editFormData, setEditFormData] = useState<Record<string, any>>({});
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleOpenEdit = () => {
+    const initial = { ...data };
+    delete initial.id;
+    delete initial.created_at;
+    delete initial.scanne_le;
+    setEditFormData(initial);
+    setIsEditModalOpen(true);
+  };
+
+  const handleEditChange = (key: string, value: any) => {
+    setEditFormData(prev => ({ ...prev, [key]: value }));
+  };
+
+  const handleSaveEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSaving(true);
+    const res = await updateInscription(id, table, editFormData);
+    if (res.success) {
+      setIsEditModalOpen(false);
+    } else {
+      alert(res.error || 'Erreur lors de la modification.');
+    }
+    setIsSaving(false);
+  };
 
   const handleDelete = async () => {
     if (!window.confirm('Êtes-vous sûr de vouloir supprimer cette inscription définitivement ?')) return;
@@ -60,6 +118,14 @@ export default function AdminActionButtons({ id, table, data, currentStatus }: A
           title="Voir les détails"
         >
           <FaEye />
+        </button>
+
+        <button 
+          onClick={handleOpenEdit}
+          style={{ ...btnStyle, background: '#FEF3C7', color: '#D97706' }}
+          title="Modifier l'inscription"
+        >
+          <FaEdit />
         </button>
 
         {table === 'inscriptions_debat' && (
@@ -220,6 +286,210 @@ export default function AdminActionButtons({ id, table, data, currentStatus }: A
           </div>
         </div>
       )}
+
+      {isEditModalOpen && (
+        <div style={modalOverlayStyle}>
+          <div style={{ ...modalContentStyle, maxWidth: '650px' }}>
+            <div style={modalHeaderStyle}>
+              <h3 style={{ margin: 0 }}>Modifier l'inscription</h3>
+              <button onClick={() => setIsEditModalOpen(false)} style={closeBtnStyle}>
+                <FaTimes />
+              </button>
+            </div>
+            
+            <form onSubmit={handleSaveEdit} style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden', margin: 0 }}>
+              <div style={{ ...modalBodyStyle, gap: '1rem' }}>
+                {Object.entries(editFormData).map(([key, val]) => {
+                  const label = fieldLabels[key] || key.replace(/_/g, ' ').toUpperCase();
+                  
+                  if (key === 'genre') {
+                    return (
+                      <div key={key} style={fieldContainerStyle}>
+                        <label style={labelStyle}>{label}</label>
+                        <select
+                          value={val || ''}
+                          onChange={e => handleEditChange(key, e.target.value)}
+                          style={inputStyle}
+                        >
+                          <option value="Homme">Homme</option>
+                          <option value="Femme">Femme</option>
+                          <option value="M">Masculin (M)</option>
+                          <option value="F">Féminin (F)</option>
+                        </select>
+                      </div>
+                    );
+                  }
+
+                  if (key === 'participer_cif') {
+                    return (
+                      <div key={key} style={fieldContainerStyle}>
+                        <label style={labelStyle}>{label}</label>
+                        <select
+                          value={val || 'non'}
+                          onChange={e => handleEditChange(key, e.target.value)}
+                          style={inputStyle}
+                        >
+                          <option value="oui">Oui</option>
+                          <option value="non">Non</option>
+                        </select>
+                      </div>
+                    );
+                  }
+
+                  if (key === 'statut' && table === 'inscriptions_cif') {
+                    return (
+                      <div key={key} style={fieldContainerStyle}>
+                        <label style={labelStyle}>{label}</label>
+                        <select
+                          value={val || ''}
+                          onChange={e => handleEditChange(key, e.target.value)}
+                          style={inputStyle}
+                        >
+                          <option value="En attente de paiement">En attente de paiement</option>
+                          <option value="Payé & Confirmé">Payé & Confirmé</option>
+                        </select>
+                      </div>
+                    );
+                  }
+
+                  if (key === 'statut' && table === 'delegues_congres') {
+                    return (
+                      <div key={key} style={fieldContainerStyle}>
+                        <label style={labelStyle}>{label}</label>
+                        <select
+                          value={val || 'en_attente'}
+                          onChange={e => handleEditChange(key, e.target.value)}
+                          style={inputStyle}
+                        >
+                          <option value="en_attente">En attente</option>
+                          <option value="valide">Validé</option>
+                          <option value="rejete">Rejeté</option>
+                        </select>
+                      </div>
+                    );
+                  }
+
+                  if (key === 'type_participant' && table === 'inscriptions_debat') {
+                    return (
+                      <div key={key} style={fieldContainerStyle}>
+                        <label style={labelStyle}>{label}</label>
+                        <select
+                          value={val || ''}
+                          onChange={e => handleEditChange(key, e.target.value)}
+                          style={inputStyle}
+                        >
+                          <option value="universitaire">Universitaire / Enseignant</option>
+                          <option value="ong_asso">Responsable d'ONG ou d'Association</option>
+                          <option value="religieux_commu">Leader religieux ou communautaire</option>
+                          <option value="institution_partenaire">Institution ou Partenaire technique</option>
+                          <option value="media">Média / Journaliste</option>
+                          <option value="societe_civile">Acteur de la Société Civile</option>
+                          <option value="etudiant">Étudiant / Jeune</option>
+                          <option value="comite_orga">Comité d'organisation</option>
+                          <option value="comite_scientifique">Comité scientifique</option>
+                        </select>
+                      </div>
+                    );
+                  }
+
+                  if (key === 'tranche_age') {
+                    return (
+                      <div key={key} style={fieldContainerStyle}>
+                        <label style={labelStyle}>{label}</label>
+                        <select
+                          value={val || ''}
+                          onChange={e => handleEditChange(key, e.target.value)}
+                          style={inputStyle}
+                        >
+                          <option value="moins_18">Moins de 18 ans</option>
+                          <option value="18_25">18 à 25 ans</option>
+                          <option value="26_35">26 à 35 ans</option>
+                          <option value="plus_35">Plus de 35 ans</option>
+                        </select>
+                      </div>
+                    );
+                  }
+
+                  if (key === 'moyen_deplacement') {
+                    return (
+                      <div key={key} style={fieldContainerStyle}>
+                        <label style={labelStyle}>{label}</label>
+                        <select
+                          value={val || ''}
+                          onChange={e => handleEditChange(key, e.target.value)}
+                          style={inputStyle}
+                        >
+                          <option value="avion">Avion</option>
+                          <option value="bus_car">Bus / Car (transport commun)</option>
+                          <option value="voiture_perso">Voiture personnelle</option>
+                          <option value="autre">Autre</option>
+                        </select>
+                      </div>
+                    );
+                  }
+
+                  if (typeof val === 'number') {
+                    return (
+                      <div key={key} style={fieldContainerStyle}>
+                        <label style={labelStyle}>{label}</label>
+                        <input
+                          type="number"
+                          value={val ?? ''}
+                          onChange={e => handleEditChange(key, e.target.valueAsNumber || 0)}
+                          style={inputStyle}
+                        />
+                      </div>
+                    );
+                  }
+
+                  if (key === 'attente') {
+                    return (
+                      <div key={key} style={fieldContainerStyle}>
+                        <label style={labelStyle}>{label}</label>
+                        <textarea
+                          rows={3}
+                          value={val || ''}
+                          onChange={e => handleEditChange(key, e.target.value)}
+                          style={{ ...inputStyle, resize: 'vertical' }}
+                        />
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <div key={key} style={fieldContainerStyle}>
+                      <label style={labelStyle}>{label}</label>
+                      <input
+                        type="text"
+                        value={val ?? ''}
+                        onChange={e => handleEditChange(key, e.target.value)}
+                        style={inputStyle}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div style={modalFooterStyle}>
+                <button 
+                  type="button" 
+                  onClick={() => setIsEditModalOpen(false)} 
+                  style={{ padding: '0.5rem 1rem', background: '#64748B', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', marginRight: '0.5rem' }}
+                >
+                  Annuler
+                </button>
+                <button 
+                  type="submit" 
+                  disabled={isSaving} 
+                  style={{ padding: '0.5rem 1.25rem', background: '#D97706', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
+                >
+                  {isSaving ? 'Enregistrement...' : 'Enregistrer'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </>
   );
 }
@@ -233,6 +503,28 @@ const btnStyle = {
   alignItems: 'center',
   justifyContent: 'center',
   transition: 'opacity 0.2s',
+};
+
+const fieldContainerStyle: React.CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '0.35rem',
+};
+
+const labelStyle: React.CSSProperties = {
+  fontSize: '0.85rem',
+  fontWeight: '600',
+  color: '#475569',
+};
+
+const inputStyle: React.CSSProperties = {
+  padding: '0.5rem 0.75rem',
+  borderRadius: '4px',
+  border: '1px solid #CBD5E1',
+  fontSize: '0.95rem',
+  outline: 'none',
+  width: '100%',
+  boxSizing: 'border-box',
 };
 
 const modalOverlayStyle: React.CSSProperties = {
