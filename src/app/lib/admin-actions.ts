@@ -192,26 +192,76 @@ export async function uploadInscriptionPhoto(formData: FormData) {
 // ============================================================
 // SCAN QR — Vérifier un passe
 // ============================================================
-export async function verifyPass(id: string) {
-  await checkAdminAuth();
-  if (!isSupabaseConfigured()) return { success: false, error: "Supabase n'est pas configuré" };
+// ============================================================
+// SCAN QR — Vérifier un passe (Public & Controller Ready)
+// ============================================================
+export async function verifyPass(query: string) {
+  if (!isSupabaseConfigured()) return { success: false, error: "Supabase n'est pas configuré." };
+  
   try {
-    let tableName = 'inscriptions_debat';
-    let { data: passData, error: findError } = await supabase
-      .from(tableName).select('*').eq('id', id).single();
+    const cleanQuery = (query || '').trim();
+    if (!cleanQuery) return { success: false, error: "Code, ID ou email invalide." };
 
-    if (findError || !passData) {
-      tableName = 'inscriptions_cif';
-      const { data: cifData, error: cifError } = await supabase
-        .from(tableName).select('*').eq('id', id).single();
-      if (cifError || !cifData) {
-        return { success: false, error: 'Billet introuvable ou invalide.' };
+    // Extract UUID if present inside query
+    const uuidMatch = cleanQuery.match(/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/);
+    const searchTarget = uuidMatch ? uuidMatch[0] : cleanQuery;
+
+    let tableName: 'inscriptions_debat' | 'inscriptions_cif' | 'delegues_congres' = 'inscriptions_debat';
+    let passData: any = null;
+
+    // Helper to query table by ID, email, telephone/whatsapp, or nom_prenom
+    const findInTable = async (t: 'inscriptions_debat' | 'inscriptions_cif' | 'delegues_congres') => {
+      // 1. By ID
+      if (uuidMatch) {
+        const { data } = await supabaseAdmin.from(t).select('*').eq('id', searchTarget).maybeSingle();
+        if (data) return data;
       }
-      passData = cifData;
+
+      // 2. Exact match ID
+      const { data: byExactId } = await supabaseAdmin.from(t).select('*').eq('id', cleanQuery).maybeSingle();
+      if (byExactId) return byExactId;
+
+      // 3. By Email
+      const { data: byEmail } = await supabaseAdmin.from(t).select('*').ilike('email', cleanQuery).maybeSingle();
+      if (byEmail) return byEmail;
+
+      // 4. By Telephone / Whatsapp
+      const { data: byPhone } = await supabaseAdmin.from(t).select('*').or(`telephone.eq.${cleanQuery},whatsapp.eq.${cleanQuery}`).maybeSingle();
+      if (byPhone) return byPhone;
+
+      // 5. By Nom & Prénom
+      const { data: byName } = await supabaseAdmin.from(t).select('*').ilike('nom_prenom', `%${cleanQuery}%`).limit(1);
+      if (byName && byName.length > 0) return byName[0];
+
+      return null;
+    };
+
+    // 1. Check Débat
+    passData = await findInTable('inscriptions_debat');
+    if (passData) tableName = 'inscriptions_debat';
+
+    // 2. Check CIF
+    if (!passData) {
+      passData = await findInTable('inscriptions_cif');
+      if (passData) tableName = 'inscriptions_cif';
     }
 
-    passData.is_cif = tableName === 'inscriptions_cif';
+    // 3. Check Délégués
+    if (!passData) {
+      passData = await findInTable('delegues_congres');
+      if (passData) tableName = 'delegues_congres';
+    }
 
+    if (!passData) {
+      return { success: false, error: `Billet ou participant introuvable pour "${cleanQuery}".` };
+    }
+
+    passData.table_type = tableName;
+    passData.is_cif = tableName === 'inscriptions_cif';
+    passData.is_delegue = tableName === 'delegues_congres';
+    passData.is_debat = tableName === 'inscriptions_debat';
+
+    // Check if already scanned
     if (passData.scanne_le) {
       return {
         success: false,
@@ -220,11 +270,20 @@ export async function verifyPass(id: string) {
       };
     }
 
-    const { error: updateError } = await supabaseAdmin
-      .from(tableName).update({ scanne_le: new Date().toISOString() }).eq('id', id);
-    if (updateError) throw updateError;
+    // Mark scan timestamp
+    const scanTime = new Date().toISOString();
+    try {
+      await supabaseAdmin
+        .from(tableName)
+        .update({ scanne_le: scanTime })
+        .eq('id', passData.id);
+      passData.scanne_le = scanTime;
+    } catch (e) {
+      console.warn('Impossible de mettre à jour scanne_le:', e);
+    }
 
     revalidatePath('/admin/inscriptions');
+    revalidatePath('/admin/verify');
     return { success: true, data: passData };
   } catch (error: any) {
     return { success: false, error: error.message || 'Erreur lors de la vérification' };
