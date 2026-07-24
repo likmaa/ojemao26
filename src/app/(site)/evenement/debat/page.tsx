@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { FaYoutube, FaUsers, FaClock, FaCalendarAlt, FaMapMarkerAlt, FaTicketAlt } from 'react-icons/fa';
-import { supabase } from '@/app/lib/supabase';
+import { supabaseAdmin } from '@/app/lib/supabase';
 
 export const revalidate = 0;
 
@@ -18,10 +18,10 @@ const focalPoints = [
 ];
 
 export default async function DebatPage() {
-  const { data: eventRow } = await supabase.from('events').select('image_url').eq('title', 'debat').maybeSingle();
+  const { data: eventRow } = await supabaseAdmin.from('events').select('image_url').eq('title', 'debat').maybeSingle();
   const debatImage = eventRow?.image_url || '/images/affiche-d1.webp';
 
-  const { data: dbFocalPoints } = await supabase.from('focal_points').select('*').order('country', { ascending: true });
+  const { data: dbFocalPoints } = await supabaseAdmin.from('focal_points').select('*').order('country', { ascending: true });
   const activeFocalPoints = dbFocalPoints && dbFocalPoints.length > 0 ? dbFocalPoints : focalPoints;
 
   return (
