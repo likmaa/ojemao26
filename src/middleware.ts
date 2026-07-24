@@ -2,8 +2,11 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
-  // Ignorer la page de login pour éviter une boucle infinie
-  if (request.nextUrl.pathname.startsWith('/admin/login')) {
+  // Ignorer la page de login et la vérification QR code pour éviter un blocage
+  if (
+    request.nextUrl.pathname.startsWith('/admin/login') ||
+    request.nextUrl.pathname.startsWith('/admin/verify')
+  ) {
     return NextResponse.next();
   }
 
