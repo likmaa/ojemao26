@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { supabase, isSupabaseConfigured } from '@/app/lib/supabase';
+import { supabaseAdmin, isSupabaseConfigured } from '@/app/lib/supabase';
 import fs from 'fs/promises';
 import path from 'path';
 import ExportButtons from '@/app/admin/ExportButtons';
@@ -32,11 +32,11 @@ export default async function AdminDashboard() {
 
   if (isSupabaseConfigured()) {
     mode = 'supabase';
-    const { data: dData, error: dErr } = await supabase.from('inscriptions_debat').select('*').order('created_at', { ascending: false });
+    const { data: dData, error: dErr } = await supabaseAdmin.from('inscriptions_debat').select('*').order('created_at', { ascending: false });
     if (!dErr && dData) debatData = dData;
-    const { data: cData, error: cErr } = await supabase.from('inscriptions_cif').select('*').order('created_at', { ascending: false });
+    const { data: cData, error: cErr } = await supabaseAdmin.from('inscriptions_cif').select('*').order('created_at', { ascending: false });
     if (!cErr && cData) cifData = cData;
-    const { data: delData, error: delErr } = await supabase.from('delegues_congres').select('*').order('created_at', { ascending: false });
+    const { data: delData, error: delErr } = await supabaseAdmin.from('delegues_congres').select('*').order('created_at', { ascending: false });
     if (!delErr && delData) deleguesData = delData;
   } else {
     debatData = await loadLocalJson('debat_submissions.json');
