@@ -64,10 +64,56 @@ export async function updateInscription(
     }
     const { error } = await supabaseAdmin.from(table).update(updateFields).eq('id', id);
     if (error) throw error;
+
+    if (table === 'inscriptions_debat' && updateFields.participer_cif === 'oui') {
+      await syncDebatToCifIfOui(updateFields);
+    }
+
     revalidatePath('/admin/inscriptions');
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message || 'Erreur lors de la modification' };
+  }
+}
+
+async function syncDebatToCifIfOui(data: Record<string, any>) {
+  try {
+    const cleanEmail = data.email ? data.email.toLowerCase().trim() : '';
+    const cleanPhone = data.telephone ? data.telephone.replace(/\s+/g, '').replace(/\+/g, '') : '';
+    const cleanName = data.nom_prenom ? data.nom_prenom.toLowerCase().trim() : '';
+
+    const filters = [];
+    if (cleanEmail) filters.push(`email.eq.${cleanEmail}`);
+    if (cleanPhone) filters.push(`whatsapp.eq.${cleanPhone}`);
+    if (cleanName) filters.push(`nom_prenom.eq.${cleanName}`);
+
+    if (filters.length > 0) {
+      const { data: existing } = await supabaseAdmin
+        .from('inscriptions_cif')
+        .select('id')
+        .or(filters.join(','));
+
+      if (!existing || existing.length === 0) {
+        const cifData = {
+          nom_prenom: data.nom_prenom,
+          genre: data.genre === 'Femme' ? 'F' : 'M',
+          tranche_age: '26_35',
+          ville_pays: data.ville_pays || 'Cotonou, Bénin',
+          statut: 'En attente de paiement',
+          etablissement: data.fonction || data.organisation || data.poste || 'Participant Débat',
+          whatsapp: data.telephone || '—',
+          email: data.email || '',
+          association: data.organisation || 'Inscrit Débat',
+          moyen_deplacement: 'bus_car',
+          date_arrivee: '24/07/2026',
+          date_depart: '28/07/2026',
+          comment_connu: 'Via Inscription Débat (Admin)',
+        };
+        await supabaseAdmin.from('inscriptions_cif').insert([cifData]);
+      }
+    }
+  } catch (err) {
+    console.error('Erreur lors de la synchronisation automatique CIF:', err);
   }
 }
 
@@ -103,6 +149,10 @@ export async function addInscriptionByAdmin(
 
     const { data: inserted, error } = await supabaseAdmin.from(table).insert([insertData]).select();
     if (error) throw error;
+
+    if (table === 'inscriptions_debat' && insertData.participer_cif === 'oui') {
+      await syncDebatToCifIfOui(insertData);
+    }
 
     revalidatePath('/admin/inscriptions');
     return { success: true, data: inserted?.[0] };
