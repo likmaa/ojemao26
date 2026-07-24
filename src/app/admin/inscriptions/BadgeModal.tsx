@@ -169,41 +169,167 @@ export default function BadgeModal({ data, isOpen, onClose }: BadgeModalProps) {
     }
   };
 
-  // Download high-resolution PNG
-  const handleDownloadPng = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const link = document.createElement('a');
-    const filename = `badge_${(nameText || 'co').toLowerCase().replace(/\s+/g, '_')}.png`;
-    link.download = filename;
-    link.href = canvas.toDataURL('image/png');
-    link.click();
+  // Download 4K Ultra HD resolution PNG (2400 x 3600 px)
+  const handleDownloadPng = (scaleFactor: number = 2) => {
+    const exportCanvas = document.createElement('canvas');
+    exportCanvas.width = 1200 * scaleFactor;
+    exportCanvas.height = 1800 * scaleFactor;
+    const ctx = exportCanvas.getContext('2d');
+    if (!ctx) return;
+
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+
+    const templateSrc = templateType === 'co' 
+      ? '/images/gabarit-co.png' 
+      : templateType === 'cif' 
+        ? '/images/gabarit-cif.png' 
+        : '/images/gabarit-debat.png';
+
+    const bgImg = new Image();
+    bgImg.crossOrigin = 'anonymous';
+    bgImg.src = templateSrc;
+
+    bgImg.onload = () => {
+      // 1. Draw 4K Background
+      ctx.drawImage(bgImg, 0, 0, exportCanvas.width, exportCanvas.height);
+
+      // 2. Draw 4K Photo Circle
+      if (photoImgRef.current) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(
+          circleCenterX * scaleFactor, 
+          circleCenterY * scaleFactor, 
+          circleRadius * scaleFactor, 
+          0, 
+          Math.PI * 2, 
+          true
+        );
+        ctx.closePath();
+        ctx.clip();
+
+        const img = photoImgRef.current;
+        const aspect = img.width / img.height;
+
+        const diameter = (circleRadius * 2) * scaleFactor;
+        let drawW = diameter * photoScale;
+        let drawH = (diameter / aspect) * photoScale;
+
+        if (aspect > 1) {
+          drawH = diameter * photoScale;
+          drawW = diameter * aspect * photoScale;
+        }
+
+        const drawX = (circleCenterX * scaleFactor) - drawW / 2 + (photoOffsetX * scaleFactor);
+        const drawY = (circleCenterY * scaleFactor) - drawH / 2 + (photoOffsetY * scaleFactor);
+
+        ctx.drawImage(img, drawX, drawY, drawW, drawH);
+        ctx.restore();
+      }
+
+      // 3. Draw 4K Text
+      if (nameText) {
+        ctx.save();
+        const activeFont = customFont.trim() ? customFont.trim() : fontFamily;
+        ctx.font = `900 ${fontSize * scaleFactor}px ${activeFont}`;
+        ctx.fillStyle = textColor;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(nameText.toUpperCase(), nameCenterX * scaleFactor, nameCenterY * scaleFactor);
+        ctx.restore();
+      }
+
+      const link = document.createElement('a');
+      const label4k = scaleFactor >= 2 ? '_4K_UltraHD' : '_HD';
+      const filename = `badge${label4k}_${(nameText || 'co').toLowerCase().replace(/\s+/g, '_')}.png`;
+      link.download = filename;
+      link.href = exportCanvas.toDataURL('image/png', 1.0);
+      link.click();
+    };
   };
 
-  // Print badge
+  // Print badge in high quality
   const handlePrint = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const dataUrl = canvas.toDataURL('image/png');
-    const printWindow = window.open('', '_blank');
-    if (printWindow) {
-      printWindow.document.write(`
-        <html>
-          <head>
-            <title>Impression Badge - ${nameText}</title>
-            <style>
-              @page { size: A6 portrait; margin: 0; }
-              body { margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; background: white; }
-              img { width: 100mm; height: 150mm; object-fit: contain; }
-            </style>
-          </head>
-          <body>
-            <img src="${dataUrl}" onload="window.print(); window.close();" />
-          </body>
-        </html>
-      `);
-      printWindow.document.close();
-    }
+    const exportCanvas = document.createElement('canvas');
+    const scaleFactor = 2;
+    exportCanvas.width = 1200 * scaleFactor;
+    exportCanvas.height = 1800 * scaleFactor;
+    const ctx = exportCanvas.getContext('2d');
+    if (!ctx) return;
+
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+
+    const templateSrc = templateType === 'co' 
+      ? '/images/gabarit-co.png' 
+      : templateType === 'cif' 
+        ? '/images/gabarit-cif.png' 
+        : '/images/gabarit-debat.png';
+
+    const bgImg = new Image();
+    bgImg.crossOrigin = 'anonymous';
+    bgImg.src = templateSrc;
+
+    bgImg.onload = () => {
+      ctx.drawImage(bgImg, 0, 0, exportCanvas.width, exportCanvas.height);
+
+      if (photoImgRef.current) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(circleCenterX * scaleFactor, circleCenterY * scaleFactor, circleRadius * scaleFactor, 0, Math.PI * 2, true);
+        ctx.closePath();
+        ctx.clip();
+
+        const img = photoImgRef.current;
+        const aspect = img.width / img.height;
+        const diameter = (circleRadius * 2) * scaleFactor;
+        let drawW = diameter * photoScale;
+        let drawH = (diameter / aspect) * photoScale;
+        if (aspect > 1) {
+          drawH = diameter * photoScale;
+          drawW = diameter * aspect * photoScale;
+        }
+
+        const drawX = (circleCenterX * scaleFactor) - drawW / 2 + (photoOffsetX * scaleFactor);
+        const drawY = (circleCenterY * scaleFactor) - drawH / 2 + (photoOffsetY * scaleFactor);
+
+        ctx.drawImage(img, drawX, drawY, drawW, drawH);
+        ctx.restore();
+      }
+
+      if (nameText) {
+        ctx.save();
+        const activeFont = customFont.trim() ? customFont.trim() : fontFamily;
+        ctx.font = `900 ${fontSize * scaleFactor}px ${activeFont}`;
+        ctx.fillStyle = textColor;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(nameText.toUpperCase(), nameCenterX * scaleFactor, nameCenterY * scaleFactor);
+        ctx.restore();
+      }
+
+      const dataUrl = exportCanvas.toDataURL('image/png', 1.0);
+      const printWindow = window.open('', '_blank');
+      if (printWindow) {
+        printWindow.document.write(`
+          <html>
+            <head>
+              <title>Impression Badge 4K - ${nameText}</title>
+              <style>
+                @page { size: A6 portrait; margin: 0; }
+                body { margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; background: white; }
+                img { width: 100mm; height: 150mm; object-fit: contain; }
+              </style>
+            </head>
+            <body>
+              <img src="${dataUrl}" onload="window.print(); window.close();" />
+            </body>
+          </html>
+        `);
+        printWindow.document.close();
+      }
+    };
   };
 
   return (
@@ -215,7 +341,7 @@ export default function BadgeModal({ data, isOpen, onClose }: BadgeModalProps) {
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
             <FaIdCard style={{ color: '#10B981', fontSize: '1.4rem' }} />
             <h3 style={{ margin: 0, color: '#0F172A', fontSize: '1.2rem', fontWeight: '800' }}>
-              Générateur & Ajusteur de Badges
+              Générateur & Ajusteur de Badges (4K Ultra HD)
             </h3>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -240,12 +366,15 @@ export default function BadgeModal({ data, isOpen, onClose }: BadgeModalProps) {
               />
             </div>
             
-            <div style={{ display: 'flex', gap: '0.75rem', width: '100%', marginTop: '1rem' }}>
-              <button onClick={handleDownloadPng} style={downloadBtnStyle}>
-                <FaDownload /> Télécharger PNG (HD)
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', width: '100%', marginTop: '1rem' }}>
+              <button onClick={() => handleDownloadPng(2)} style={download4KBtnStyle}>
+                <FaDownload /> Télécharger PNG (4K Ultra HD)
+              </button>
+              <button onClick={() => handleDownloadPng(1)} style={downloadBtnStyle}>
+                <FaDownload /> Télécharger PNG (Standard HD)
               </button>
               <button onClick={handlePrint} style={printBtnStyle}>
-                <FaPrint /> Imprimer le Badge
+                <FaPrint /> Imprimer le Badge (4K)
               </button>
             </div>
           </div>
@@ -692,8 +821,25 @@ const downloadBtnStyle: React.CSSProperties = {
   gap: '0.4rem',
 };
 
+const download4KBtnStyle: React.CSSProperties = {
+  width: '100%',
+  padding: '0.85rem',
+  background: 'linear-gradient(135deg, #059669 0%, #10B981 100%)',
+  color: 'white',
+  border: 'none',
+  borderRadius: '8px',
+  cursor: 'pointer',
+  fontWeight: '800',
+  fontSize: '0.9rem',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: '0.5rem',
+  boxShadow: '0 4px 12px rgba(16, 185, 129, 0.25)',
+};
+
 const printBtnStyle: React.CSSProperties = {
-  flex: 1,
+  width: '100%',
   padding: '0.75rem',
   background: '#3B82F6',
   color: 'white',
