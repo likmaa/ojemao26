@@ -58,7 +58,10 @@ export async function updateInscription(
   await checkAdminAuth();
   if (!isSupabaseConfigured()) return { success: false, error: "Supabase n'est pas configuré" };
   try {
-    const { id: _id, created_at: _created_at, scanne_le: _scanne_le, ...updateFields } = data;
+    const { id: _id, created_at: _created_at, scanne_le: _scanne_le, nombre_delegues: _nombre_delegues, ...updateFields } = data;
+    if (table === 'delegues_congres') {
+      delete updateFields.nombre_delegues;
+    }
     const { error } = await supabaseAdmin.from(table).update(updateFields).eq('id', id);
     if (error) throw error;
     revalidatePath('/admin/inscriptions');
@@ -78,15 +81,22 @@ export async function addInscriptionByAdmin(
   await checkAdminAuth();
   if (!isSupabaseConfigured()) return { success: false, error: "Supabase n'est pas configuré" };
   try {
+    const insertData = { ...data };
+
     // For debate table, calculate numero_chaise if not explicitly set
-    if (table === 'inscriptions_debat' && !data.numero_chaise) {
+    if (table === 'inscriptions_debat' && !insertData.numero_chaise) {
       const { count } = await supabaseAdmin
         .from('inscriptions_debat')
         .select('*', { count: 'exact', head: true });
-      data.numero_chaise = (count || 0) + 1;
+      insertData.numero_chaise = (count || 0) + 1;
     }
 
-    const { data: inserted, error } = await supabaseAdmin.from(table).insert([data]).select();
+    // Clean non-existent columns in delegues_congres schema
+    if (table === 'delegues_congres') {
+      delete insertData.nombre_delegues;
+    }
+
+    const { data: inserted, error } = await supabaseAdmin.from(table).insert([insertData]).select();
     if (error) throw error;
 
     revalidatePath('/admin/inscriptions');

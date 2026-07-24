@@ -774,17 +774,6 @@ export default function InscriptionsClient({ debatData, cifData, deleguesData }:
                     </div>
 
                     <div style={fieldContainerStyle}>
-                      <label style={labelStyle}>Nombre de délégués représentés *</label>
-                      <input
-                        type="number"
-                        min="1"
-                        value={addFormData.nombre_delegues || 1}
-                        onChange={e => handleAddChange('nombre_delegues', e.target.valueAsNumber || 1)}
-                        style={inputStyle}
-                      />
-                    </div>
-
-                    <div style={fieldContainerStyle}>
                       <label style={labelStyle}>Téléphone / WhatsApp *</label>
                       <input
                         type="text"
