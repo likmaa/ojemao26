@@ -282,8 +282,8 @@ export default function BadgeModal({ data, isOpen, onClose }: BadgeModalProps) {
                   </div>
                   <input
                     type="range"
-                    min="300"
-                    max="750"
+                    min="100"
+                    max="1200"
                     step="2"
                     value={circleCenterY}
                     onChange={(e) => setCircleCenterY(parseInt(e.target.value))}
@@ -299,8 +299,8 @@ export default function BadgeModal({ data, isOpen, onClose }: BadgeModalProps) {
                   </div>
                   <input
                     type="range"
-                    min="400"
-                    max="800"
+                    min="100"
+                    max="1100"
                     step="2"
                     value={circleCenterX}
                     onChange={(e) => setCircleCenterX(parseInt(e.target.value))}
@@ -316,8 +316,8 @@ export default function BadgeModal({ data, isOpen, onClose }: BadgeModalProps) {
                   </div>
                   <input
                     type="range"
-                    min="150"
-                    max="450"
+                    min="50"
+                    max="600"
                     step="2"
                     value={circleRadius}
                     onChange={(e) => setCircleRadius(parseInt(e.target.value))}
