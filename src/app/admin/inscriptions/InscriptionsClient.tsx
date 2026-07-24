@@ -175,6 +175,7 @@ export default function InscriptionsClient({ debatData, cifData, deleguesData }:
       if (!payload.genre) payload.genre = 'Homme';
       if (!payload.type_participant) payload.type_participant = 'universitaire';
       if (!payload.participer_cif) payload.participer_cif = 'non';
+      if (!payload.fonction) payload.fonction = payload.poste || payload.type_participant || payload.organisation || 'Participant';
     } else if (addCategory === 'cif') {
       if (!payload.genre) payload.genre = 'M';
       if (!payload.tranche_age) payload.tranche_age = '26_35';
@@ -499,6 +500,17 @@ export default function InscriptionsClient({ debatData, cifData, deleguesData }:
                         placeholder="Ex: Sous commission logistique"
                         value={addFormData.poste || ''}
                         onChange={e => handleAddChange('poste', e.target.value)}
+                        style={inputStyle}
+                      />
+                    </div>
+
+                    <div style={fieldContainerStyle}>
+                      <label style={labelStyle}>Fonction / Profession (Facultatif)</label>
+                      <input
+                        type="text"
+                        placeholder="Ex: Enseignant-Chercheur, Étudiant, Journaliste..."
+                        value={addFormData.fonction || ''}
+                        onChange={e => handleAddChange('fonction', e.target.value)}
                         style={inputStyle}
                       />
                     </div>

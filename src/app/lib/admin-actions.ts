@@ -83,12 +83,17 @@ export async function addInscriptionByAdmin(
   try {
     const insertData = { ...data };
 
-    // For debate table, calculate numero_chaise if not explicitly set
-    if (table === 'inscriptions_debat' && !insertData.numero_chaise) {
-      const { count } = await supabaseAdmin
-        .from('inscriptions_debat')
-        .select('*', { count: 'exact', head: true });
-      insertData.numero_chaise = (count || 0) + 1;
+    // For debate table, calculate numero_chaise if not explicitly set and ensure fonction is populated
+    if (table === 'inscriptions_debat') {
+      if (!insertData.numero_chaise) {
+        const { count } = await supabaseAdmin
+          .from('inscriptions_debat')
+          .select('*', { count: 'exact', head: true });
+        insertData.numero_chaise = (count || 0) + 1;
+      }
+      if (!insertData.fonction) {
+        insertData.fonction = insertData.poste || insertData.type_participant || insertData.organisation || 'Participant';
+      }
     }
 
     // Clean non-existent columns in delegues_congres schema
