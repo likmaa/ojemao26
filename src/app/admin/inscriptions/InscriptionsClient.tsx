@@ -317,7 +317,7 @@ export default function InscriptionsClient({ debatData, cifData, deleguesData }:
             <table style={s.table}>
               <thead>
                 <tr>
-                  {['Date', 'Nom & Prénom', 'Fonction / Établissement', 'Statut', 'Pays/Ville', 'Âge', 'Déplacement', 'Arrivée → Départ', 'Contact', ...(!readOnly ? ['Actions'] : [])].map(h => (
+                  {['Date', 'Nom & Prénom', 'Type / Fonction', 'Statut de paiement', 'Pays/Ville', 'Âge', 'Déplacement', 'Arrivée → Départ', 'Contact', ...(!readOnly ? ['Actions'] : [])].map(h => (
                     <th key={h} style={s.th}>{h}</th>
                   ))}
                 </tr>
@@ -642,8 +642,9 @@ export default function InscriptionsClient({ debatData, cifData, deleguesData }:
                         onChange={e => handleAddChange('statut', e.target.value)}
                         style={inputStyle}
                       >
-                        <option value="Payé & Confirmé">Payé & Confirmé</option>
-                        <option value="En attente de paiement">En attente de paiement</option>
+                        <option value="Payé & Confirmé">💳 Payé & Confirmé</option>
+                        <option value="Exonéré">🎁 Exonéré</option>
+                        <option value="En attente de paiement">⏳ En attente de paiement</option>
                       </select>
                     </div>
 
