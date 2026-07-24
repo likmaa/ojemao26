@@ -42,6 +42,7 @@ next-env.d.ts
 
 # local folders
 CO-26/
+scripts/
 
 # Exports (CSV, PDF) — ne jamais envoyer sur git
 *.csv
