@@ -2,8 +2,9 @@
 
 import { useState } from 'react';
 import { deleteInscription, updateStatus, validerDelegue, updateInscription, uploadInscriptionPhoto } from '@/app/lib/admin-actions';
-import { FaTrash, FaCheck, FaEye, FaTimes, FaTicketAlt, FaFileAlt, FaEdit, FaUpload, FaImage, FaGift } from 'react-icons/fa';
+import { FaTrash, FaCheck, FaEye, FaTimes, FaTicketAlt, FaFileAlt, FaEdit, FaUpload, FaImage, FaGift, FaIdCard } from 'react-icons/fa';
 import { QRCodeCanvas } from 'qrcode.react';
+import BadgeModal from './BadgeModal';
 
 interface AdminActionButtonsProps {
   id: string;
@@ -47,6 +48,7 @@ export default function AdminActionButtons({ id, table, data, currentStatus }: A
   const [isUpdating, setIsUpdating] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPassModalOpen, setIsPassModalOpen] = useState(false);
+  const [isBadgeModalOpen, setIsBadgeModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editFormData, setEditFormData] = useState<Record<string, any>>({});
   const [isSaving, setIsSaving] = useState(false);
@@ -141,6 +143,14 @@ export default function AdminActionButtons({ id, table, data, currentStatus }: A
           title="Modifier l'inscription"
         >
           <FaEdit />
+        </button>
+
+        <button 
+          onClick={() => setIsBadgeModalOpen(true)}
+          style={{ ...btnStyle, background: '#F0FDF4', color: '#16A34A' }}
+          title="Générer le Badge"
+        >
+          <FaIdCard />
         </button>
 
         {table === 'inscriptions_debat' && (
@@ -575,6 +585,12 @@ export default function AdminActionButtons({ id, table, data, currentStatus }: A
           </div>
         </div>
       )}
+
+      <BadgeModal 
+        data={data} 
+        isOpen={isBadgeModalOpen} 
+        onClose={() => setIsBadgeModalOpen(false)} 
+      />
     </>
   );
 }
