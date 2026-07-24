@@ -2,7 +2,8 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import AdminActionButtons from './AdminActionButtons';
-
+import { FaUserPlus, FaTimes, FaUpload } from 'react-icons/fa';
+import { addInscriptionByAdmin, uploadInscriptionPhoto } from '@/app/lib/admin-actions';
 
 interface InscriptionsClientProps {
   debatData: any[];
@@ -23,6 +24,13 @@ const formatDate = (isoString: string) => {
 export default function InscriptionsClient({ debatData, cifData, deleguesData }: InscriptionsClientProps) {
   const [activeTab, setActiveTab] = useState<ActiveTab>('debat');
   const [readOnly, setReadOnly] = useState(false);
+
+  // ─── ADD PARTICIPANT MODAL STATE ─────────────────────────────
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [addCategory, setAddCategory] = useState<ActiveTab>('debat');
+  const [addFormData, setAddFormData] = useState<Record<string, any>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
 
   useEffect(() => {
     // Mode lecture seule si rôle hébergement
@@ -130,6 +138,63 @@ export default function InscriptionsClient({ debatData, cifData, deleguesData }:
   const resetCif = () => { setCifSearch(''); setCifStatut(''); setCifPays(''); setCifDeplacement(''); setCifAge(''); setCifDateFrom(''); setCifDateTo(''); setCifSort('newest'); };
   const resetDel = () => { setDelSearch(''); setDelStatut(''); setDelPays(''); setDelMandat(''); setDelDateFrom(''); setDelDateTo(''); setDelSort('newest'); };
 
+  const handleAddChange = (key: string, value: any) => {
+    setAddFormData(prev => ({ ...prev, [key]: value }));
+  };
+
+  const handleAddPhotoUpload = async (file: File) => {
+    if (!file) return;
+    setIsUploadingPhoto(true);
+    const formData = new FormData();
+    formData.append('file', file);
+    const res = await uploadInscriptionPhoto(formData);
+    if (res.success && res.url) {
+      handleAddChange('photo_profil', res.url);
+    } else {
+      alert(res.error || "Erreur lors du téléversement de la photo.");
+    }
+    setIsUploadingPhoto(false);
+  };
+
+  const handleSaveAdd = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!addFormData.nom_prenom) {
+      alert("Veuillez saisir le nom et le prénom.");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    let targetTable: 'inscriptions_debat' | 'inscriptions_cif' | 'delegues_congres' = 'inscriptions_debat';
+    if (addCategory === 'cif') targetTable = 'inscriptions_cif';
+    if (addCategory === 'delegues') targetTable = 'delegues_congres';
+
+    const payload = { ...addFormData };
+
+    if (addCategory === 'debat') {
+      if (!payload.genre) payload.genre = 'Homme';
+      if (!payload.type_participant) payload.type_participant = 'universitaire';
+      if (!payload.participer_cif) payload.participer_cif = 'non';
+    } else if (addCategory === 'cif') {
+      if (!payload.genre) payload.genre = 'M';
+      if (!payload.tranche_age) payload.tranche_age = '26_35';
+      if (!payload.statut) payload.statut = 'Payé & Confirmé';
+      if (!payload.moyen_deplacement) payload.moyen_deplacement = 'bus_car';
+    } else if (addCategory === 'delegues') {
+      if (!payload.statut) payload.statut = 'valide';
+      if (!payload.nombre_delegues) payload.nombre_delegues = 1;
+    }
+
+    const res = await addInscriptionByAdmin(targetTable, payload);
+    if (res.success) {
+      setIsAddModalOpen(false);
+      setAddFormData({});
+    } else {
+      alert(res.error || "Erreur lors de l'ajout du participant.");
+    }
+    setIsSubmitting(false);
+  };
+
   const hasDebatFilters = debatSearch || debatType || debatPays || debatGenre || debatDateFrom || debatDateTo;
   const hasCifFilters = cifSearch || cifStatut || cifPays || cifDeplacement || cifAge || cifDateFrom || cifDateTo;
   const hasDelFilters = delSearch || delStatut || delPays || delMandat || delDateFrom || delDateTo;
@@ -148,6 +213,33 @@ export default function InscriptionsClient({ debatData, cifData, deleguesData }:
             {tab === 'delegues' && `🏛️ Délégués (${filteredDelegues.length}/${deleguesData.length})`}
           </button>
         ))}
+
+        {!readOnly && (
+          <button
+            onClick={() => {
+              setAddCategory(activeTab);
+              setAddFormData({});
+              setIsAddModalOpen(true);
+            }}
+            style={{
+              marginLeft: 'auto',
+              padding: '0.6rem 1.25rem',
+              background: '#10B981',
+              color: '#FFFFFF',
+              border: 'none',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              fontWeight: '700',
+              fontSize: '0.9rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              boxShadow: '0 2px 4px rgba(16,185,129,0.2)',
+            }}
+          >
+            <FaUserPlus /> Ajouter un participant
+          </button>
+        )}
       </div>
 
       {/* ─── DEBAT TAB ─────────────────────────────────────────── */}
@@ -308,9 +400,529 @@ export default function InscriptionsClient({ debatData, cifData, deleguesData }:
           </div>
         </div>
       )}
+
+      {isAddModalOpen && (
+        <div style={modalOverlayStyle}>
+          <div style={{ ...modalContentStyle, maxWidth: '650px' }}>
+            <div style={modalHeaderStyle}>
+              <h3 style={{ margin: 0 }}>➕ Ajouter un nouveau participant</h3>
+              <button onClick={() => setIsAddModalOpen(false)} style={closeBtnStyle}>
+                <FaTimes />
+              </button>
+            </div>
+
+            {/* Category Selector Tabs */}
+            <div style={{ display: 'flex', borderBottom: '1px solid #E2E8F0', background: '#F8FAFC' }}>
+              {(['debat', 'cif', 'delegues'] as ActiveTab[]).map(tab => (
+                <button
+                  key={tab}
+                  type="button"
+                  onClick={() => {
+                    setAddCategory(tab);
+                    setAddFormData({});
+                  }}
+                  style={{
+                    flex: 1,
+                    padding: '0.75rem',
+                    border: 'none',
+                    borderBottom: addCategory === tab ? '3px solid #10B981' : 'none',
+                    background: addCategory === tab ? '#FFFFFF' : 'transparent',
+                    fontWeight: addCategory === tab ? '700' : '500',
+                    color: addCategory === tab ? '#10B981' : '#64748B',
+                    cursor: 'pointer',
+                    fontSize: '0.85rem'
+                  }}
+                >
+                  {tab === 'debat' && '🎤 Débat (D2C26)'}
+                  {tab === 'cif' && '🎓 CIF 2026'}
+                  {tab === 'delegues' && '🏛️ Délégué Congrès'}
+                </button>
+              ))}
+            </div>
+
+            <form onSubmit={handleSaveAdd} style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden', margin: 0 }}>
+              <div style={{ ...modalBodyStyle, gap: '1rem' }}>
+
+                {/* Common field: Nom & Prénom */}
+                <div style={fieldContainerStyle}>
+                  <label style={labelStyle}>Nom & Prénom *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Ex: Koffi Marc BENIN"
+                    value={addFormData.nom_prenom || ''}
+                    onChange={e => handleAddChange('nom_prenom', e.target.value)}
+                    style={inputStyle}
+                  />
+                </div>
+
+                {addCategory === 'debat' && (
+                  <>
+                    <div style={fieldContainerStyle}>
+                      <label style={labelStyle}>Genre *</label>
+                      <select
+                        value={addFormData.genre || 'Homme'}
+                        onChange={e => handleAddChange('genre', e.target.value)}
+                        style={inputStyle}
+                      >
+                        <option value="Homme">Homme</option>
+                        <option value="Femme">Femme</option>
+                      </select>
+                    </div>
+
+                    <div style={fieldContainerStyle}>
+                      <label style={labelStyle}>Type de participant *</label>
+                      <select
+                        value={addFormData.type_participant || 'universitaire'}
+                        onChange={e => handleAddChange('type_participant', e.target.value)}
+                        style={inputStyle}
+                      >
+                        <option value="universitaire">Universitaire / Enseignant</option>
+                        <option value="ong_asso">Responsable d'ONG ou d'Association</option>
+                        <option value="religieux_commu">Leader religieux ou communautaire</option>
+                        <option value="institution_partenaire">Institution ou Partenaire technique</option>
+                        <option value="media">Média / Journaliste</option>
+                        <option value="societe_civile">Acteur de la Société Civile</option>
+                        <option value="etudiant">Étudiant / Jeune</option>
+                        <option value="comite_orga">Comité d'organisation</option>
+                        <option value="comite_scientifique">Comité scientifique</option>
+                      </select>
+                    </div>
+
+                    <div style={fieldContainerStyle}>
+                      <label style={labelStyle}>Poste / Sous-commission (Facultatif)</label>
+                      <input
+                        type="text"
+                        placeholder="Ex: Sous commission logistique"
+                        value={addFormData.poste || ''}
+                        onChange={e => handleAddChange('poste', e.target.value)}
+                        style={inputStyle}
+                      />
+                    </div>
+
+                    <div style={fieldContainerStyle}>
+                      <label style={labelStyle}>Organisation / Établissement *</label>
+                      <input
+                        type="text"
+                        placeholder="Ex: Université d'Abomey-Calavi"
+                        value={addFormData.organisation || ''}
+                        onChange={e => handleAddChange('organisation', e.target.value)}
+                        style={inputStyle}
+                      />
+                    </div>
+
+                    <div style={fieldContainerStyle}>
+                      <label style={labelStyle}>Ville & Pays *</label>
+                      <input
+                        type="text"
+                        placeholder="Ex: Cotonou, Bénin"
+                        value={addFormData.ville_pays || ''}
+                        onChange={e => handleAddChange('ville_pays', e.target.value)}
+                        style={inputStyle}
+                      />
+                    </div>
+
+                    <div style={fieldContainerStyle}>
+                      <label style={labelStyle}>Téléphone / WhatsApp *</label>
+                      <input
+                        type="text"
+                        placeholder="Ex: +229 97 00 00 00"
+                        value={addFormData.telephone || ''}
+                        onChange={e => handleAddChange('telephone', e.target.value)}
+                        style={inputStyle}
+                      />
+                    </div>
+
+                    <div style={fieldContainerStyle}>
+                      <label style={labelStyle}>Adresse Email *</label>
+                      <input
+                        type="email"
+                        placeholder="Ex: participant@gmail.com"
+                        value={addFormData.email || ''}
+                        onChange={e => handleAddChange('email', e.target.value)}
+                        style={inputStyle}
+                      />
+                    </div>
+
+                    <div style={fieldContainerStyle}>
+                      <label style={labelStyle}>Photo de profil</label>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                        {addFormData.photo_profil && (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.5rem', background: '#F8FAFC', borderRadius: '6px', border: '1px solid #E2E8F0' }}>
+                            <img src={addFormData.photo_profil} alt="Profil" style={{ width: '50px', height: '50px', borderRadius: '50%', objectFit: 'cover' }} />
+                            <span style={{ fontSize: '0.8rem', color: '#10B981', fontWeight: 'bold' }}>✓ Photo chargée</span>
+                          </div>
+                        )}
+                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                          <input
+                            type="text"
+                            placeholder="URL de la photo (https://...)"
+                            value={addFormData.photo_profil || ''}
+                            onChange={e => handleAddChange('photo_profil', e.target.value)}
+                            style={{ ...inputStyle, flex: 1 }}
+                          />
+                          <label style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '0.4rem',
+                            padding: '0.5rem 0.75rem',
+                            background: isUploadingPhoto ? '#94A3B8' : '#3B82F6',
+                            color: 'white',
+                            borderRadius: '4px',
+                            cursor: isUploadingPhoto ? 'not-allowed' : 'pointer',
+                            fontSize: '0.85rem',
+                            fontWeight: '600',
+                            whiteSpace: 'nowrap'
+                          }}>
+                            {isUploadingPhoto ? 'Envoi...' : <><FaUpload /> Importer</>}
+                            <input
+                              type="file"
+                              accept="image/*"
+                              disabled={isUploadingPhoto}
+                              style={{ display: 'none' }}
+                              onChange={e => {
+                                const f = e.target.files?.[0];
+                                if (f) handleAddPhotoUpload(f);
+                              }}
+                            />
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div style={fieldContainerStyle}>
+                      <label style={labelStyle}>Participer aussi au CIF ?</label>
+                      <select
+                        value={addFormData.participer_cif || 'non'}
+                        onChange={e => handleAddChange('participer_cif', e.target.value)}
+                        style={inputStyle}
+                      >
+                        <option value="non">Non</option>
+                        <option value="oui">Oui</option>
+                      </select>
+                    </div>
+                  </>
+                )}
+
+                {addCategory === 'cif' && (
+                  <>
+                    <div style={fieldContainerStyle}>
+                      <label style={labelStyle}>Genre *</label>
+                      <select
+                        value={addFormData.genre || 'M'}
+                        onChange={e => handleAddChange('genre', e.target.value)}
+                        style={inputStyle}
+                      >
+                        <option value="M">Masculin (M)</option>
+                        <option value="F">Féminin (F)</option>
+                      </select>
+                    </div>
+
+                    <div style={fieldContainerStyle}>
+                      <label style={labelStyle}>Tranche d'âge *</label>
+                      <select
+                        value={addFormData.tranche_age || '26_35'}
+                        onChange={e => handleAddChange('tranche_age', e.target.value)}
+                        style={inputStyle}
+                      >
+                        <option value="moins_18">Moins de 18 ans</option>
+                        <option value="18_25">18 à 25 ans</option>
+                        <option value="26_35">26 à 35 ans</option>
+                        <option value="plus_35">Plus de 35 ans</option>
+                      </select>
+                    </div>
+
+                    <div style={fieldContainerStyle}>
+                      <label style={labelStyle}>Statut de paiement *</label>
+                      <select
+                        value={addFormData.statut || 'Payé & Confirmé'}
+                        onChange={e => handleAddChange('statut', e.target.value)}
+                        style={inputStyle}
+                      >
+                        <option value="Payé & Confirmé">Payé & Confirmé</option>
+                        <option value="En attente de paiement">En attente de paiement</option>
+                      </select>
+                    </div>
+
+                    <div style={fieldContainerStyle}>
+                      <label style={labelStyle}>Ville & Pays *</label>
+                      <input
+                        type="text"
+                        placeholder="Ex: Cotonou, Bénin"
+                        value={addFormData.ville_pays || ''}
+                        onChange={e => handleAddChange('ville_pays', e.target.value)}
+                        style={inputStyle}
+                      />
+                    </div>
+
+                    <div style={fieldContainerStyle}>
+                      <label style={labelStyle}>Établissement / Organisation *</label>
+                      <input
+                        type="text"
+                        placeholder="Ex: Faculté de Droit"
+                        value={addFormData.etablissement || ''}
+                        onChange={e => handleAddChange('etablissement', e.target.value)}
+                        style={inputStyle}
+                      />
+                    </div>
+
+                    <div style={fieldContainerStyle}>
+                      <label style={labelStyle}>Numéro WhatsApp *</label>
+                      <input
+                        type="text"
+                        placeholder="Ex: +229 97 00 00 00"
+                        value={addFormData.whatsapp || ''}
+                        onChange={e => handleAddChange('whatsapp', e.target.value)}
+                        style={inputStyle}
+                      />
+                    </div>
+
+                    <div style={fieldContainerStyle}>
+                      <label style={labelStyle}>Adresse Email *</label>
+                      <input
+                        type="email"
+                        placeholder="Ex: cif.participant@gmail.com"
+                        value={addFormData.email || ''}
+                        onChange={e => handleAddChange('email', e.target.value)}
+                        style={inputStyle}
+                      />
+                    </div>
+
+                    <div style={fieldContainerStyle}>
+                      <label style={labelStyle}>Association (Facultatif)</label>
+                      <input
+                        type="text"
+                        placeholder="Ex: Club des Juristes"
+                        value={addFormData.association || ''}
+                        onChange={e => handleAddChange('association', e.target.value)}
+                        style={inputStyle}
+                      />
+                    </div>
+
+                    <div style={fieldContainerStyle}>
+                      <label style={labelStyle}>Moyen de déplacement</label>
+                      <select
+                        value={addFormData.moyen_deplacement || 'bus_car'}
+                        onChange={e => handleAddChange('moyen_deplacement', e.target.value)}
+                        style={inputStyle}
+                      >
+                        <option value="bus_car">Bus / Car (transport commun)</option>
+                        <option value="avion">Avion</option>
+                        <option value="voiture_perso">Voiture personnelle</option>
+                        <option value="autre">Autre</option>
+                      </select>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                      <div style={fieldContainerStyle}>
+                        <label style={labelStyle}>Date d'arrivée</label>
+                        <input
+                          type="text"
+                          placeholder="Ex: 24/07/2026 14:00"
+                          value={addFormData.date_arrivee || ''}
+                          onChange={e => handleAddChange('date_arrivee', e.target.value)}
+                          style={inputStyle}
+                        />
+                      </div>
+                      <div style={fieldContainerStyle}>
+                        <label style={labelStyle}>Date de départ</label>
+                        <input
+                          type="text"
+                          placeholder="Ex: 28/07/2026 10:00"
+                          value={addFormData.date_depart || ''}
+                          onChange={e => handleAddChange('date_depart', e.target.value)}
+                          style={inputStyle}
+                        />
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {addCategory === 'delegues' && (
+                  <>
+                    <div style={fieldContainerStyle}>
+                      <label style={labelStyle}>Structure représentée *</label>
+                      <input
+                        type="text"
+                        placeholder="Ex: Bureau National AIMB"
+                        value={addFormData.structure || ''}
+                        onChange={e => handleAddChange('structure', e.target.value)}
+                        style={inputStyle}
+                      />
+                    </div>
+
+                    <div style={fieldContainerStyle}>
+                      <label style={labelStyle}>Pays *</label>
+                      <input
+                        type="text"
+                        placeholder="Ex: Bénin"
+                        value={addFormData.pays || ''}
+                        onChange={e => handleAddChange('pays', e.target.value)}
+                        style={inputStyle}
+                      />
+                    </div>
+
+                    <div style={fieldContainerStyle}>
+                      <label style={labelStyle}>Mandat / Fonction *</label>
+                      <input
+                        type="text"
+                        placeholder="Ex: Président National"
+                        value={addFormData.mandat || ''}
+                        onChange={e => handleAddChange('mandat', e.target.value)}
+                        style={inputStyle}
+                      />
+                    </div>
+
+                    <div style={fieldContainerStyle}>
+                      <label style={labelStyle}>Nombre de délégués représentés *</label>
+                      <input
+                        type="number"
+                        min="1"
+                        value={addFormData.nombre_delegues || 1}
+                        onChange={e => handleAddChange('nombre_delegues', e.target.valueAsNumber || 1)}
+                        style={inputStyle}
+                      />
+                    </div>
+
+                    <div style={fieldContainerStyle}>
+                      <label style={labelStyle}>Téléphone / WhatsApp *</label>
+                      <input
+                        type="text"
+                        placeholder="Ex: +229 97 00 00 00"
+                        value={addFormData.telephone || ''}
+                        onChange={e => handleAddChange('telephone', e.target.value)}
+                        style={inputStyle}
+                      />
+                    </div>
+
+                    <div style={fieldContainerStyle}>
+                      <label style={labelStyle}>Adresse Email *</label>
+                      <input
+                        type="email"
+                        placeholder="Ex: delegue@aimb.org"
+                        value={addFormData.email || ''}
+                        onChange={e => handleAddChange('email', e.target.value)}
+                        style={inputStyle}
+                      />
+                    </div>
+
+                    <div style={fieldContainerStyle}>
+                      <label style={labelStyle}>Statut *</label>
+                      <select
+                        value={addFormData.statut || 'valide'}
+                        onChange={e => handleAddChange('statut', e.target.value)}
+                        style={inputStyle}
+                      >
+                        <option value="valide">Validé</option>
+                        <option value="en_attente">En attente</option>
+                        <option value="rejete">Rejeté</option>
+                      </select>
+                    </div>
+                  </>
+                )}
+
+              </div>
+
+              <div style={modalFooterStyle}>
+                <button
+                  type="button"
+                  onClick={() => setIsAddModalOpen(false)}
+                  style={{ padding: '0.5rem 1rem', background: '#64748B', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', marginRight: '0.5rem' }}
+                >
+                  Annuler
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  style={{ padding: '0.5rem 1.25rem', background: '#10B981', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
+                >
+                  {isSubmitting ? 'Ajout en cours...' : 'Ajouter le participant'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+
+const modalOverlayStyle: React.CSSProperties = {
+  position: 'fixed',
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  zIndex: 1000,
+};
+
+const modalContentStyle: React.CSSProperties = {
+  backgroundColor: '#fff',
+  borderRadius: '8px',
+  width: '90%',
+  maxWidth: '600px',
+  maxHeight: '90vh',
+  display: 'flex',
+  flexDirection: 'column',
+  boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+};
+
+const modalHeaderStyle: React.CSSProperties = {
+  padding: '1rem 1.5rem',
+  borderBottom: '1px solid #E2E8F0',
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+};
+
+const closeBtnStyle = {
+  background: 'none',
+  border: 'none',
+  fontSize: '1.2rem',
+  cursor: 'pointer',
+  color: '#64748B',
+};
+
+const modalBodyStyle: React.CSSProperties = {
+  padding: '1.5rem',
+  overflowY: 'auto',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '0.75rem',
+};
+
+const modalFooterStyle: React.CSSProperties = {
+  padding: '1rem 1.5rem',
+  borderTop: '1px solid #E2E8F0',
+  display: 'flex',
+  justifyContent: 'flex-end',
+};
+
+const fieldContainerStyle: React.CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '0.35rem',
+};
+
+const labelStyle: React.CSSProperties = {
+  fontSize: '0.85rem',
+  fontWeight: '600',
+  color: '#475569',
+};
+
+const inputStyle: React.CSSProperties = {
+  padding: '0.5rem 0.75rem',
+  borderRadius: '4px',
+  border: '1px solid #CBD5E1',
+  fontSize: '0.95rem',
+  outline: 'none',
+  width: '100%',
+  boxSizing: 'border-box',
+};
 
 // ─── SUB-COMPONENTS ──────────────────────────────────────────────────────────
 

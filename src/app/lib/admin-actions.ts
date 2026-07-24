@@ -69,6 +69,34 @@ export async function updateInscription(
 }
 
 // ============================================================
+// INSCRIPTIONS — Create participant manually by admin
+// ============================================================
+export async function addInscriptionByAdmin(
+  table: 'inscriptions_debat' | 'inscriptions_cif' | 'delegues_congres',
+  data: Record<string, any>
+) {
+  await checkAdminAuth();
+  if (!isSupabaseConfigured()) return { success: false, error: "Supabase n'est pas configuré" };
+  try {
+    // For debate table, calculate numero_chaise if not explicitly set
+    if (table === 'inscriptions_debat' && !data.numero_chaise) {
+      const { count } = await supabaseAdmin
+        .from('inscriptions_debat')
+        .select('*', { count: 'exact', head: true });
+      data.numero_chaise = (count || 0) + 1;
+    }
+
+    const { data: inserted, error } = await supabaseAdmin.from(table).insert([data]).select();
+    if (error) throw error;
+
+    revalidatePath('/admin/inscriptions');
+    return { success: true, data: inserted?.[0] };
+  } catch (error: any) {
+    return { success: false, error: error.message || "Erreur lors de l'ajout du participant" };
+  }
+}
+
+// ============================================================
 // INSCRIPTIONS — Upload photo from admin edit modal
 // ============================================================
 export async function uploadInscriptionPhoto(formData: FormData) {
