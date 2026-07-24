@@ -55,8 +55,8 @@ export default function Footer() {
                 "logo_aceemub.webp",
                 "logo_raibenin.webp"
               ].map((name, i) => (
-                <div key={i}>
-                  <img src={`/images/organisateurs/${name}`} alt={`Organisateur ${i + 1}`} style={{ height: '40px', width: 'auto', objectFit: 'contain' }} />
+                <div key={i} style={{ position: 'relative', height: '40px', width: '90px' }}>
+                  <Image src={`/images/organisateurs/${name}`} alt={`Organisateur ${i + 1}`} fill style={{ objectFit: 'contain' }} sizes="90px" />
                 </div>
               ))}
             </div>
