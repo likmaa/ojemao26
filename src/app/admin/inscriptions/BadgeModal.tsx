@@ -83,42 +83,42 @@ export default function BadgeModal({ data, isOpen, onClose }: BadgeModalProps) {
       ctx.clearRect(0, 0, 1200, 1800);
       ctx.drawImage(bgImg, 0, 0, 1200, 1800);
 
-      // 2. Draw Photo in Circular Frame (Center: X=600, Y=492, Radius=252)
+      // 2. Draw Photo in Circular Frame (Center: X=600, Y=508, Radius=305)
       if (photoImgRef.current) {
         ctx.save();
 
         // Create Circular Clip
         ctx.beginPath();
-        ctx.arc(600, 492, 252, 0, Math.PI * 2, true);
+        ctx.arc(600, 508, 305, 0, Math.PI * 2, true);
         ctx.closePath();
         ctx.clip();
 
         const img = photoImgRef.current;
         const aspect = img.width / img.height;
 
-        let drawW = 504 * photoScale;
-        let drawH = (504 / aspect) * photoScale;
+        let drawW = 610 * photoScale;
+        let drawH = (610 / aspect) * photoScale;
 
         if (aspect > 1) {
-          drawH = 504 * photoScale;
-          drawW = 504 * aspect * photoScale;
+          drawH = 610 * photoScale;
+          drawW = 610 * aspect * photoScale;
         }
 
         const drawX = 600 - drawW / 2 + photoOffsetX;
-        const drawY = 492 - drawH / 2 + photoOffsetY;
+        const drawY = 508 - drawH / 2 + photoOffsetY;
 
         ctx.drawImage(img, drawX, drawY, drawW, drawH);
         ctx.restore();
       }
 
-      // 3. Draw Name inside white pill box (Center: X=600, Y=1182)
+      // 3. Draw Name inside white pill box (Center: X=600, Y=1179)
       if (nameText) {
         ctx.save();
         ctx.font = `900 ${fontSize}px Inter, Roboto, sans-serif`;
         ctx.fillStyle = textColor;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText(nameText.toUpperCase(), 600, 1182);
+        ctx.fillText(nameText.toUpperCase(), 600, 1179);
         ctx.restore();
       }
     };
