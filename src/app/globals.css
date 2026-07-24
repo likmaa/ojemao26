@@ -247,6 +247,8 @@ a {
 @media (min-width: 1024px) {
   .admin-sidebar {
     left: 0 !important;
+    width: var(--sidebar-width, 220px) !important;
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), left 0.3s ease !important;
   }
   .admin-close-btn {
     display: none !important;
@@ -255,8 +257,9 @@ a {
     display: none !important;
   }
   .admin-main {
-    margin-left: 280px !important;
+    margin-left: var(--sidebar-width, 220px) !important;
     padding-top: 2rem !important; /* Reset padding for desktop */
+    transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
   }
 }
 
