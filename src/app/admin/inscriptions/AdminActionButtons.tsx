@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { deleteInscription, updateStatus, validerDelegue, updateInscription, uploadInscriptionPhoto } from '@/app/lib/admin-actions';
-import { FaTrash, FaCheck, FaEye, FaTimes, FaTicketAlt, FaFileAlt, FaEdit, FaUpload, FaImage } from 'react-icons/fa';
+import { FaTrash, FaCheck, FaEye, FaTimes, FaTicketAlt, FaFileAlt, FaEdit, FaUpload, FaImage, FaGift } from 'react-icons/fa';
 import { QRCodeCanvas } from 'qrcode.react';
 
 interface AdminActionButtonsProps {
@@ -153,15 +153,29 @@ export default function AdminActionButtons({ id, table, data, currentStatus }: A
           </button>
         )}
 
-        {table === 'inscriptions_cif' && currentStatus === 'En attente de paiement' && (
-          <button 
-            onClick={() => handleStatusChange('Payé & Confirmé')}
-            disabled={isUpdating}
-            style={{ ...btnStyle, background: '#ECFDF5', color: '#10B981' }}
-            title="Marquer comme payé"
-          >
-            {isUpdating ? '...' : <FaCheck />}
-          </button>
+        {table === 'inscriptions_cif' && (
+          <>
+            {currentStatus !== 'Payé & Confirmé' && (
+              <button 
+                onClick={() => handleStatusChange('Payé & Confirmé')}
+                disabled={isUpdating}
+                style={{ ...btnStyle, background: '#ECFDF5', color: '#10B981' }}
+                title="Valider comme Payé & Confirmé"
+              >
+                {isUpdating ? '...' : <FaCheck />}
+              </button>
+            )}
+            {currentStatus !== 'Exonéré' && (
+              <button 
+                onClick={() => handleStatusChange('Exonéré')}
+                disabled={isUpdating}
+                style={{ ...btnStyle, background: '#EEF2FF', color: '#6366F1' }}
+                title="Valider comme Exonéré"
+              >
+                {isUpdating ? '...' : <FaGift />}
+              </button>
+            )}
+          </>
         )}
 
         {table === 'delegues_congres' && currentStatus === 'en_attente' && (
@@ -362,6 +376,7 @@ export default function AdminActionButtons({ id, table, data, currentStatus }: A
                         >
                           <option value="En attente de paiement">En attente de paiement</option>
                           <option value="Payé & Confirmé">Payé & Confirmé</option>
+                          <option value="Exonéré">Exonéré</option>
                         </select>
                       </div>
                     );

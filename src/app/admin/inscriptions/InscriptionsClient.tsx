@@ -317,7 +317,7 @@ export default function InscriptionsClient({ debatData, cifData, deleguesData }:
             <table style={s.table}>
               <thead>
                 <tr>
-                  {['Date', 'Nom & Prénom', 'Statut', 'Pays/Ville', 'Âge', 'Déplacement', 'Arrivée → Départ', 'Contact', ...(!readOnly ? ['Actions'] : [])].map(h => (
+                  {['Date', 'Nom & Prénom', 'Fonction / Établissement', 'Statut', 'Pays/Ville', 'Âge', 'Déplacement', 'Arrivée → Départ', 'Contact', ...(!readOnly ? ['Actions'] : [])].map(h => (
                     <th key={h} style={s.th}>{h}</th>
                   ))}
                 </tr>
@@ -327,11 +327,14 @@ export default function InscriptionsClient({ debatData, cifData, deleguesData }:
                   <tr key={row.id} style={s.tr}>
                     <td style={s.td}><span style={s.dateText}>{formatDate(row.created_at)}</span></td>
                     <td style={{...s.td, fontWeight:'600'}}>{row.nom_prenom}</td>
+                    <td style={s.td}><span style={{...s.badge, background: '#F1F5F9', color: '#475569'}}>{row.etablissement || '—'}</span></td>
                     <td style={s.td}>
                       <span style={{...s.badge, 
-                        background: row.statut === 'Payé & Confirmé' ? 'rgba(16,185,129,0.1)' : 'rgba(245,158,11,0.1)',
-                        color: row.statut === 'Payé & Confirmé' ? '#10B981' : '#F59E0B'
-                      }}>{row.statut}</span>
+                        background: row.statut === 'Payé & Confirmé' ? 'rgba(16,185,129,0.1)' : row.statut === 'Exonéré' ? 'rgba(99,102,241,0.1)' : 'rgba(245,158,11,0.1)',
+                        color: row.statut === 'Payé & Confirmé' ? '#10B981' : row.statut === 'Exonéré' ? '#6366F1' : '#F59E0B'
+                      }}>
+                        {row.statut === 'Payé & Confirmé' ? '✓ Payé & Confirmé' : row.statut === 'Exonéré' ? '🎁 Exonéré' : '⏳ ' + (row.statut || 'En attente')}
+                      </span>
                     </td>
                     <td style={s.td}>{row.ville_pays}</td>
                     <td style={s.td}>{row.tranche_age}</td>
@@ -343,7 +346,7 @@ export default function InscriptionsClient({ debatData, cifData, deleguesData }:
                     </td>
                     {!readOnly && <td style={s.td}><AdminActionButtons id={row.id} table="inscriptions_cif" data={row} currentStatus={row.statut} /></td>}
                   </tr>
-                )) : <EmptyRow cols={readOnly ? 8 : 9} />}
+                )) : <EmptyRow cols={readOnly ? 9 : 10} />}
               </tbody>
             </table>
           </div>
